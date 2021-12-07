@@ -4,6 +4,7 @@
   "description": "a url shortener written in typescript",
   "main": "index.ts",
   "scripts": {
+    "start": "tsc && node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,12 @@
   "bugs": {
     "url": "https://github.com/Diogenesoftoronto/tinyapp/issues"
   },
-  "homepage": "https://github.com/Diogenesoftoronto/tinyapp#readme"
+  "homepage": "https://github.com/Diogenesoftoronto/tinyapp#readme",
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "tslint": "^5.12.1"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
