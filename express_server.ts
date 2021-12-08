@@ -76,7 +76,12 @@ function getRandomInt(min: number, max: number) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
-
+// when the user submits an Update request, it should modify the corresponding longURL, and then redirect the client back to "/urls".
+app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
+  const shortUrl: string = req.params.shortURL;
+  urlDatabase[shortUrl] = req.body.longURL;
+  res.redirect("/urls");
+});
 // a function that generates a random string of 6 alphanumeric characters
 function generateRandomString() {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

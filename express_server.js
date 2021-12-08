@@ -53,6 +53,12 @@ app.post("/urls", (req, res) => {
     urlDatabase[randomString] = req.body.longURL;
     res.redirect(`/urls/${randomString}`);
 });
+// when a user press the delete button on the urls_index page this is called it then redirects them to the urls_index page after deleting the url
+app.post("/urls/:shortURL/delete", (req, res) => {
+    const shortUrl = req.params.shortURL;
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+});
 //  this is all the urls but in a json format
 app.get("/urls.json", (_req, res) => {
     res.json(urlDatabase);
@@ -67,6 +73,12 @@ function getRandomInt(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
+// when the user submits an Update request, it should modify the corresponding longURL, and then redirect the client back to "/urls".
+app.post("/urls/:shortURL", (req, res) => {
+    const shortUrl = req.params.shortURL;
+    urlDatabase[shortUrl] = req.body.longURL;
+    res.redirect("/urls");
+});
 // a function that generates a random string of 6 alphanumeric characters
 function generateRandomString() {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
