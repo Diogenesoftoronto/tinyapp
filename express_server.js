@@ -8,7 +8,8 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const app = (0, express_1.default)();
 const PORT = 8080;
 const morgan = require('morgan');
-const urlDatabase = {
+;
+let urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
     "9sm5xK": "http://www.google.com"
 };
@@ -22,8 +23,15 @@ app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.get("/", (_req, res) => {
     res.render("frontpage");
 });
+// this is called whenever the user goes to create a new url
 app.get("/urls/new", (_req, res) => {
     res.render("urls_new");
+});
+// this gets called whener the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
+app.get("/u/:shortURL", (req, res) => {
+    const shortURL = req.params.shortURL;
+    const longURL = urlDatabase[shortURL];
+    res.redirect(longURL);
 });
 // this is called everytime a short url is requested from urls
 app.get("/urls/:shortURL", (req, res) => {
@@ -38,6 +46,12 @@ app.get("/urls", (_req, res) => {
     const templateVars = { urls: urlDatabase };
     res.render("urls_index", templateVars);
 });
+// when a user enters a new url the server generates a short url and stores it in the database then redirects the user to the urls stored on the server
+app.post("/urls", (req, res) => {
+    const randomString = generateRandomString();
+    urlDatabase[randomString] = req.body.longURL;
+    res.redirect(`/urls/${randomString}`);
+});
 //  this is all the urls but in a json format
 app.get("/urls.json", (_req, res) => {
     res.json(urlDatabase);
@@ -46,12 +60,13 @@ app.get("/urls.json", (_req, res) => {
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
 });
-// a function that generates a random string of 6 alphanumeric characters
+// creates a random number between min and max
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
+// a function that generates a random string of 6 alphanumeric characters
 function generateRandomString() {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     // definitely a better way to implement this but im lazy, i will just say that this is a way to program using the AHA method instead of DRY
