@@ -4,7 +4,7 @@
   "description": "a url shortener written in typescript",
   "main": "index.ts",
   "scripts": {
-    "start": "tsc && node express_server.js",
+    "start": "tsc && ./node_modules/.bin/nodemon -L express_server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,6 +19,9 @@
   "homepage": "https://github.com/Diogenesoftoronto/tinyapp#readme",
   "devDependencies": {
     "@types/express": "^4.16.1",
+    "@types/node": "^16.11.12",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.4.0",
     "tslint": "^5.12.1"
   },
   "dependencies": {

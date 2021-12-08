@@ -10,7 +10,8 @@ interface urldata {
 };
 let urlDatabase: urldata = {
   "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "9sm5xK": "http://www.google.com",
+  "qmHFDk": "https://diogenesoftoronto.wordpress.com/"
 }
 
 // call the set up for th ejs from expressjs

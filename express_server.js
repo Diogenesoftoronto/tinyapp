@@ -11,7 +11,8 @@ const morgan = require('morgan');
 ;
 let urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com"
+    "9sm5xK": "http://www.google.com",
+    "qmHFDk": "https://diogenesoftoronto.wordpress.com/"
 };
 // call the set up for th ejs from expressjs
 app.set("view engine", "ejs");
@@ -27,7 +28,7 @@ app.get("/", (_req, res) => {
 app.get("/urls/new", (_req, res) => {
     res.render("urls_new");
 });
-// this gets called whener the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
+// this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
 app.get("/u/:shortURL", (req, res) => {
     const shortURL = req.params.shortURL;
     const longURL = urlDatabase[shortURL];
