@@ -17,7 +17,10 @@ app.set("view engine", "ejs");
 app.use(morgan('dev'));
 // this is called every time some one goes to localhost:8080/
 app.get("/", (_req, res) => {
-    res.send("Hello!\n");
+    res.render("frontpage");
+});
+app.get("/urls/new", (_req, res) => {
+    res.render("urls_new");
 });
 // this is called everytime a short url is requested from urls
 app.get("/urls/:shortURL", (req, res) => {
@@ -27,16 +30,15 @@ app.get("/urls/:shortURL", (req, res) => {
     };
     res.render("urls_show", templateVars);
 });
-//
-app.get("/urls", (req, res) => {
+
+// this is called when we want to look at all the urls in the database
+app.get("/urls", (_req, res) => {
     const templateVars = { urls: urlDatabase };
     res.render("urls_index", templateVars);
 });
-app.get("/urls.json", (req, res) => {
+//  this is all the urls but in a json format
+app.get("/urls.json", (_req, res) => {
     res.json(urlDatabase);
-});
-app.get("/hello", (req, res) => {
-    res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
