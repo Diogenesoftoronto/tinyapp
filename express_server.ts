@@ -55,7 +55,12 @@ app.post("/urls", (req: express.Request, res: express.Response) => {
   urlDatabase[randomString] = req.body.longURL;
   res.redirect(`/urls/${randomString}`);
 });
-
+// when a user press the delete button on the urls_index page this is called it then redirects them to the urls_index page after deleting the url
+app.post("/urls/:shortURL/delete", (req: express.Request, res: express.Response) => {
+  const shortUrl: string = req.params.shortURL;
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");
+});
 
 //  this is all the urls but in a json format
 app.get("/urls.json", (_req:  express.Request, res: express.Response) => {

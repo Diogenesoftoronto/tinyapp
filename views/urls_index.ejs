@@ -9,9 +9,12 @@
   <title>TinyApp</title>
 </head>
 <body>
+  
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
     <h3>My URLs</h3>
+    <form method="POST" action="/urls/9sm5xK/delete">...</form>
+    
     <table class="table">
       <thead>
         <tr>
@@ -20,13 +23,16 @@
         </tr>
       </thead>
       <tbody>
-        <% for(let url in urls) { %>
-          <tr>
-            <td><%= url %></td>
-            <td><%= urls[url] %></td>
-          </tr>
-        <% } %>
-      </tbody>
+        <form method="POST" action="/urls/9sm5xK/delete">
+          <% for(let url in urls) { %>
+            <tr>
+              <td><%= url %></td>
+              <td><%= urls[url] %></td>
+              <td><button type="submit" class="btn btn-danger">Delete</button></td>
+            </tr>
+            <% } %>
+          </form>
+        </tbody>
     </table>
   </main>
   <!-- Bootstrap JS -->
