@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 const app = express()
 const PORT = 8080
 const morgan = require('morgan');
@@ -20,7 +21,28 @@ app.set("view engine", "ejs");
 app.use(morgan('dev'));
 // make the data readable to humans from the buffer from form POST request for new urls
 app.use(bodyParser.urlencoded({extended: true}));
-
+// create some middleware for cookies
+app.use(cookieParser());
+// creates a login route
+app.get("/login", (req: express.Request, res: express.Response) => { 
+    res.render("login");
+});
+// allows users to login using their password
+app.post("/login", (req: express.Request, res: express.Response) => {
+    let user = req.body.username;
+    let pass = req.body.password;
+    // add more later here
+});
+// create a route for the user to register an account
+app.get("/register", (req: express.Request, res: express.Response) => {
+    res.render("register");
+});
+// allows the user to register an account
+app.post("/register", (req: express.Request, res: express.Response) => {
+    let user = req.body.username;
+    let pass = req.body.password;
+    // add more later here
+});
 // this is called every time some one goes to localhost:PORT/
 app.get("/", (_req:  express.Request, res: express.Response) => {
   res.render("frontpage");
