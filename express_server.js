@@ -51,7 +51,12 @@ app.post("/login/", (req, res) => {
 });
 // create a route for the user to register an account
 app.get("/register", (req, res) => {
-    res.render("register");
+    res.cookie("user", {});
+    babelDatabase['SUDOuser'] = {
+        email: "dudiest@dude.org",
+        password: "supersecret"
+    };
+    res.render("register", babelDatabase);
 });
 // allows the user to register an account
 app.post("/register", (req, res) => {
@@ -118,7 +123,6 @@ app.post("/urls", (req, res) => {
 });
 // when a user press the delete button on the urls_index page this is called it then redirects them to the urls_index page after deleting the url
 app.post("/urls/:shortURL/delete", (req, res) => {
-    const shortUrl = req.params.shortURL;
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
 });

@@ -10,11 +10,12 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create Short URL</a>
         <a class="nav-item nav-link" href="/register">Register</a>
-        
-        <a class="nav-item nav-link" href="/logout">Logout</a>
-        <form method="POST" action="/login/">
-        <input type="text" id="username" name="user" value="XxsupersoccerkidxX">
+        <%if (true) { %>
+        <a class="nav-item nav-link" href="/logout">Logout</a><% } else { %>
+        <form method="POST" action="/login/"> 
+          <input type="text" id="username" name="user" value="XxsupersoccerkidxX">
           <input type="submit" value="login">
+          <% } %> 
         </div>
       </div>
     </form>
