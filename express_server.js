@@ -6,10 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const generateRandomString = require("./generate-random-string.js");
 const app = (0, express_1.default)();
 const PORT = 8080;
 const morgan = require('morgan');
 ;
+// 
+let userDatabase = {};
 ;
 let urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
@@ -26,6 +29,7 @@ app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
 // creates a login route
 app.get("/login", (req, res) => {
+    res.cookie("test", true);
     res.render("login");
 });
 // allows users to login using their password
@@ -45,6 +49,7 @@ app.get("/register", (req, res) => {
     const user = req.body.username;
     const pass = req.body.password;
     res.render("register");
+    // conditional 
     res.redirect("/login");
 });
 // allows the user to register an account
@@ -101,22 +106,9 @@ app.get("/urls.json", (_req, res) => {
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
 });
-// creates a random number between min and max
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
-}
 // when the user submits an Update request, it should modify the corresponding longURL, and then redirect the client back to "/urls".
 app.post("/urls/:shortURL", (req, res) => {
     const shortUrl = req.params.shortURL;
     urlDatabase[shortUrl] = req.body.longURL;
     res.redirect("/urls");
 });
-// a function that generates a random string of 6 alphanumeric characters
-function generateRandomString() {
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    // definitely a better way to implement this but im lazy, i will just say that this is a way to program using the AHA method instead of DRY
-    const randomString = `${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}`;
-    return randomString;
-}
