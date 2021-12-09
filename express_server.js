@@ -5,9 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = (0, express_1.default)();
 const PORT = 8080;
 const morgan = require('morgan');
+;
 ;
 let urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
@@ -20,6 +22,38 @@ app.set("view engine", "ejs");
 app.use(morgan('dev'));
 // make the data readable to humans from the buffer from form POST request for new urls
 app.use(body_parser_1.default.urlencoded({ extended: true }));
+// create some middleware for cookies
+app.use((0, cookie_parser_1.default)());
+// creates a login route
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+// allows users to login using their password
+app.post("/login", (req, res) => {
+    const user = req.body.userId;
+    const email = req.body.email;
+    const pass = req.body.password;
+    // const userObject: userInfo = {
+    //     userId: user,
+    //     email: ,
+    // if (user === )
+    // add more later here
+});
+// create a route for the user to register an account
+app.get("/register", (req, res) => {
+    // take the user info and use that to create an account for the user
+    const user = req.body.username;
+    const pass = req.body.password;
+    res.render("register");
+    res.redirect("/login");
+});
+// allows the user to register an account
+app.post("/register", (req, res) => {
+    let user = req.body.username;
+    let pass = req.body.password;
+    // add more later here
+    res.redirect("/urls");
+});
 // this is called every time some one goes to localhost:PORT/
 app.get("/", (_req, res) => {
     res.render("frontpage");

@@ -5,7 +5,11 @@ const app = express()
 const PORT = 8080
 const morgan = require('morgan');
 
-
+interface userInfo { 
+    username: string,
+    email: string,
+    password: string
+};
 interface urldata {
     [url: string]: string
 };
@@ -29,19 +33,29 @@ app.get("/login", (req: express.Request, res: express.Response) => {
 });
 // allows users to login using their password
 app.post("/login", (req: express.Request, res: express.Response) => {
-    let user = req.body.username;
-    let pass = req.body.password;
+    const user = req.body.userId;
+    const email = req.body.email;
+    const pass = req.body.password;
+    // const userObject: userInfo = {
+    //     userId: user,
+    //     email: ,
+    // if (user === )
     // add more later here
 });
 // create a route for the user to register an account
 app.get("/register", (req: express.Request, res: express.Response) => {
+  // take the user info and use that to create an account for the user
+    const user = req.body.username;
+    const pass = req.body.password;
     res.render("register");
+    res.redirect("/login");
 });
 // allows the user to register an account
 app.post("/register", (req: express.Request, res: express.Response) => {
     let user = req.body.username;
     let pass = req.body.password;
     // add more later here
+    res.redirect("/urls");
 });
 // this is called every time some one goes to localhost:PORT/
 app.get("/", (_req:  express.Request, res: express.Response) => {
