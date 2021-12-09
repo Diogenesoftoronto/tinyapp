@@ -38,15 +38,12 @@ app.get("/", (_req, res) => {
 });
 // creates a login route
 app.get("/login", (req, res) => {
-    res.cookie("test", true);
     res.render("login");
 });
 // allows users to login using their password
-app.post("/login", (req, res) => {
-    //     // const user = req.body.userId;
-    const email = req.body.email;
-    const pass = req.body.password;
+app.post("/login/", (req, res) => {
     const userID = req.body.user;
+    res.cookie("user", userID);
     if (!userInDatabase(userID, babelDatabase)) {
         res.redirect("/register");
     }
@@ -72,7 +69,8 @@ app.post("/register", (req, res) => {
 // allows the user to logout
 app.get("/logout", (req, res) => {
     // remove the cookie
-    res.clearCookie("test");
+    res.clearCookie("user");
+    res.clearCookie("account");
     res.redirect("/");
 });
 // this is called whenever the user goes to create a new url
@@ -92,24 +90,14 @@ app.get("/u/:shortURL", (req, res) => {
     res.redirect(longURL);
 });
 // this is called everytime a short url is requested from urls
-// app.post("/urls/:shortURL", (req:  express.Request, res: express.Response) => {
-//    // const editedURL = req.params.longURL; does not exist in params
-//    let shortURL = "qmHFDk";
-//    const longURL = urlDatabase[shortURL];
-//    const urlKeyValue = {
-//        shortURL: "qmHFDk",
-//         longURL: "https://diogenesoftoronto.wordpress.com/"
-//    };
-//   res.render("urls_show", urlKeyValue);
-// });
 app.get("/urls/:shortURL", (req, res) => {
-    const editedURL = req.params.longURL;
     const shortURL = req.params.shortURL;
-    const templateVars = {
+    const longURL = urlDatabase[shortURL];
+    const urlKeyValue = {
         shortURL: shortURL,
-        longURL: editedURL
+        longURL: longURL
     };
-    res.render("urls_show", templateVars);
+    res.render("urls_show", urlKeyValue);
 });
 // when the user submits an Update request, it should modify the corresponding longURL.
 app.post("/urls/:shortURL", (req, res) => {

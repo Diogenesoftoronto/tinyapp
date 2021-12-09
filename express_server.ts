@@ -12,6 +12,7 @@ interface userInfo {
   email: string,
   password: string
 };
+
 interface userDatabase {[key: string]: userInfo}; 
 
 let babelDatabase: userDatabase = {}; 
@@ -54,8 +55,7 @@ app.get("/", (_req:  express.Request, res: express.Response) => {
 });
 
 // creates a login route
-app.get("/login", (req: express.Request, res: express.Response) => { 
-    res.cookie("test", true)
+app.get("/login", (req: express.Request, res: express.Response) => {
     res.render("login");
 });
 
@@ -92,13 +92,15 @@ app.post("/register", (req: express.Request, res: express.Response) => {
 // allows the user to logout
 app.get("/logout", (req: express.Request, res: express.Response) => {
     // remove the cookie
-    res.clearCookie("test");
+    res.clearCookie("user");
+    res.clearCookie("account");
     res.redirect("/");
 });
 // this is called whenever the user goes to create a new url
 app.get("/urls/new", (_req:  express.Request, res: express.Response) => {
   res.render("urls_new");
 });
+
 // this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
 app.post("/urls/new", (_req: express.Request, res: express.Response) => {
   const shortURL = generateRandomString();
@@ -114,26 +116,15 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 // this is called everytime a short url is requested from urls
-// app.post("/urls/:shortURL", (req:  express.Request, res: express.Response) => {
-//    // const editedURL = req.params.longURL; does not exist in params
-//    let shortURL = "qmHFDk";
-//    const longURL = urlDatabase[shortURL];
-//    const urlKeyValue = {
-//        shortURL: "qmHFDk",
-//         longURL: "https://diogenesoftoronto.wordpress.com/"
-//    };
-//   res.render("urls_show", urlKeyValue);
-// });
-
 app.get("/urls/:shortURL", (req:  express.Request, res: express.Response) => {
 
-  const editedURL: string = req.params.longURL;
   const shortURL: string = req.params.shortURL;
-  const templateVars = { 
+  const longURL: string = urlDatabase[shortURL];
+  const urlKeyValue = { 
      shortURL: shortURL,
-     longURL: editedURL }
+     longURL: longURL }
     
-    res.render("urls_show", templateVars);
+    res.render("urls_show", urlKeyValue);
     
 });
   // when the user submits an Update request, it should modify the corresponding longURL.
