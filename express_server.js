@@ -7,12 +7,17 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const generateRandomString = require("./generate-random-string.js");
+const userInDatabase = require("./user-in-database.js");
 const app = (0, express_1.default)();
-const PORT = 8080;
+const PORT = 4040;
 const morgan = require('morgan');
 ;
-// 
-let userDatabase = {};
+;
+let babelDatabase = {};
+babelDatabase['SUDOuser'] = {
+    email: "dudiest@dude.org",
+    password: "supersecret"
+};
 ;
 let urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
@@ -38,40 +43,47 @@ app.get("/login", (req, res) => {
 });
 // allows users to login using their password
 app.post("/login", (req, res) => {
-    // const user = req.body.userId;
-    // const email = req.body.email;
-    // const pass = req.body.password;
-    // // const userObject: userInfo = {
-    // //     userId: user,
-    // //     email: ,
-    // // if (user === )
-    // // add more later here
-    // res.redirect("/urls");
+    //     // const user = req.body.userId;
+    const email = req.body.email;
+    const pass = req.body.password;
+    const userID = req.body.user;
+    if (!userInDatabase(userID, babelDatabase)) {
+        res.redirect("/register");
+    }
+    res.redirect("/login");
 });
 // create a route for the user to register an account
 app.get("/register", (req, res) => {
-    // take the user info and use that to create an account for the user
-    const user = req.body.username;
-    const pass = req.body.password;
     res.render("register");
-    // conditional 
 });
 // allows the user to register an account
 app.post("/register", (req, res) => {
-    // const user = req.body.username;
-    // const pass = req.body.password;
+    const userID = req.body.username;
+    const email = req.body.email;
+    const pass = req.body.password;
+    babelDatabase[userID] = {
+        email: email,
+        password: pass
+    };
+    res.cookie('account', babelDatabase[userID]);
     // // add more later here
-    // res.redirect("/urls");
+    res.redirect("/");
 });
 // allows the user to logout
 app.get("/logout", (req, res) => {
     // remove the cookie
     res.clearCookie("test");
-    res.redirect("/urls");
+    res.redirect("/");
 });
 // this is called whenever the user goes to create a new url
 app.get("/urls/new", (_req, res) => {
     res.render("urls_new");
+});
+// this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
+app.post("/urls/new", (_req, res) => {
+    const shortURL = generateRandomString();
+    urlDatabase[shortURL] = _req.body.longURL;
+    res.redirect('/urls');
 });
 // this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
 app.get("/u/:shortURL", (req, res) => {
@@ -80,12 +92,30 @@ app.get("/u/:shortURL", (req, res) => {
     res.redirect(longURL);
 });
 // this is called everytime a short url is requested from urls
+// app.post("/urls/:shortURL", (req:  express.Request, res: express.Response) => {
+//    // const editedURL = req.params.longURL; does not exist in params
+//    let shortURL = "qmHFDk";
+//    const longURL = urlDatabase[shortURL];
+//    const urlKeyValue = {
+//        shortURL: "qmHFDk",
+//         longURL: "https://diogenesoftoronto.wordpress.com/"
+//    };
+//   res.render("urls_show", urlKeyValue);
+// });
 app.get("/urls/:shortURL", (req, res) => {
-    const shortUrl = req.params.shortURL;
+    const editedURL = req.params.longURL;
+    const shortURL = req.params.shortURL;
     const templateVars = {
-        shortURL: req.params.shortURL, longURL: req.params.longURL
+        shortURL: shortURL,
+        longURL: editedURL
     };
     res.render("urls_show", templateVars);
+});
+// when the user submits an Update request, it should modify the corresponding longURL.
+app.post("/urls/:shortURL", (req, res) => {
+    const shortUrl = req.params.shortURL;
+    urlDatabase[shortUrl] = req.body.longURL;
+    res.redirect("/urls");
 });
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (_req, res) => {
@@ -95,7 +125,7 @@ app.get("/urls", (_req, res) => {
 // when a user enters a new url the server generates a short url and stores it in the database then redirects the user to the urls stored on the server
 app.post("/urls", (req, res) => {
     const randomString = generateRandomString();
-    urlDatabase[randomString] = req.body.longURL;
+    // urlDatabase[randomString] = req.params.longURL;
     res.redirect(`/urls/${randomString}`);
 });
 // when a user press the delete button on the urls_index page this is called it then redirects them to the urls_index page after deleting the url
@@ -107,12 +137,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //  this is all the urls but in a json format
 app.get("/urls.json", (_req, res) => {
     res.json(urlDatabase);
-});
-// when the user submits an Update request, it should modify the corresponding longURL, and then redirect the client back to "/urls".
-app.post("/urls/:shortURL", (req, res) => {
-    const shortUrl = req.params.shortURL;
-    urlDatabase[shortUrl] = req.body.longURL;
-    res.redirect("/urls");
 });
 // this is called to recieve requests to the server
 app.listen(PORT, () => {
