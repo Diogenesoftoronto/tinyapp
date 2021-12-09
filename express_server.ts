@@ -7,12 +7,16 @@ const PORT = 8080
 const morgan = require('morgan');
 
 interface userInfo { 
-  username: string,
   email: string,
   password: string
 };
 // 
 let userDatabase: {[key: string]: userInfo} = {};
+// exmaple user
+// userDatabase.testUserName = {
+//   email: "test",
+//   password: "test"
+// }
 interface urldata {
   [url: string]: string
 };
@@ -35,6 +39,11 @@ app.use(bodyParser.urlencoded({extended: true}));
 // create some middleware for cookies
 app.use(cookieParser());
 
+// this is called every time some one goes to localhost:PORT/
+app.get("/", (_req:  express.Request, res: express.Response) => {
+  res.render("frontpage");
+});
+
 // creates a login route
 app.get("/login", (req: express.Request, res: express.Response) => { 
     res.cookie("test", true)
@@ -43,14 +52,15 @@ app.get("/login", (req: express.Request, res: express.Response) => {
 
 // allows users to login using their password
 app.post("/login", (req: express.Request, res: express.Response) => {
-    const user = req.body.userId;
-    const email = req.body.email;
-    const pass = req.body.password;
-    // const userObject: userInfo = {
-    //     userId: user,
-    //     email: ,
-    // if (user === )
-    // add more later here
+    // const user = req.body.userId;
+    // const email = req.body.email;
+    // const pass = req.body.password;
+    // // const userObject: userInfo = {
+    // //     userId: user,
+    // //     email: ,
+    // // if (user === )
+    // // add more later here
+    // res.redirect("/urls");
 });
 
 // create a route for the user to register an account
@@ -60,21 +70,23 @@ app.get("/register", (req: express.Request, res: express.Response) => {
     const pass = req.body.password;
     res.render("register");
     // conditional 
-    res.redirect("/login");
 });
 
 // allows the user to register an account
 app.post("/register", (req: express.Request, res: express.Response) => {
-    let user = req.body.username;
-    let pass = req.body.password;
-    // add more later here
+    // const user = req.body.username;
+    // const pass = req.body.password;
+    // // add more later here
+    // res.redirect("/urls");
+});
+
+// allows the user to logout
+app.get("/logout", (req: express.Request, res: express.Response) => {
+    // remove the cookie
+    res.clearCookie("test");
     res.redirect("/urls");
 });
 
-// this is called every time some one goes to localhost:PORT/
-app.get("/", (_req:  express.Request, res: express.Response) => {
-  res.render("frontpage");
-});
 
 // this is called whenever the user goes to create a new url
 app.get("/urls/new", (_req:  express.Request, res: express.Response) => {
@@ -98,8 +110,8 @@ app.get("/urls/:shortURL", (req:  express.Request, res: express.Response) => {
 
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (_req:  express.Request, res: express.Response) => {
-  const templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
+  const allUrls = { urls: urlDatabase };
+  res.render("urls_index", allUrls);
 });
 
 // when a user enters a new url the server generates a short url and stores it in the database then redirects the user to the urls stored on the server
@@ -121,15 +133,16 @@ app.get("/urls.json", (_req:  express.Request, res: express.Response) => {
   res.json(urlDatabase);
 });
 
-// this is called to recieve requests to the server
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
 // when the user submits an Update request, it should modify the corresponding longURL, and then redirect the client back to "/urls".
 app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
   const shortUrl: string = req.params.shortURL;
   urlDatabase[shortUrl] = req.body.longURL;
   res.redirect("/urls");
 });
+
+// this is called to recieve requests to the server
+app.listen(PORT, () => {
+  console.log(`Tinyapp listening on port ${PORT}!`);
+});
+
 
