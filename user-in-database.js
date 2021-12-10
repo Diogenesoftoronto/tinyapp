@@ -9,4 +9,6 @@ const userInDatabase = (userId, database) => {
     });
     return result;
 };
+
 module.exports = userInDatabase;
+
