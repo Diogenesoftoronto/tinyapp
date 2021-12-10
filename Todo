@@ -1,0 +1,10 @@
+Targets for TINYAPP: handling sessions and user authentication:
+users need to be limited in which routes they can access. users without a username will only be allowed to visit the '/' home route and the registration route. 
+users with a  username will be allowed to access the the login route as well as the above but nothing else.
+the header should not display the logout button if the user is not logged in.
+the header should not display the login form if the user is logged in or has a user name.
+make sure user date is not stored in cookies
+encrypt passwords.
+add captchas
+create two factor authentication controls.
+https://www.youtube.com/watch?v=T2KjBiwYyBI&list=PL_cUvD4qzbkxZZyyuXa1xkWFhRB_NoQwl watching this series after cookies to get an understanding.
