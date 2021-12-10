@@ -22,21 +22,11 @@ interface userDatabase {[key: string]: userInfo};
 
 let babelDatabase: userDatabase = {}; 
 
-// babelDatabase['SUDOuser'] = {
-//   email: "dudiest@dude.org",
-//   password: "supersecret"
-// };
 babelDatabase.SUDOuser = {
   userID: 'SUDOuser',
   email: "dudiest@dude.org",
   password: "supersecret"
 };
-
-// exmaple user
-// userDatabase.testUserName = {
-//   email: "test",
-//   password: "test"
-// }
 interface urldata {
   [url: string]: string
 };
@@ -59,18 +49,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 // create some middleware for cookies
 app.use(cookieParser());
 
-//  define a mirror function that mirrors the callback function of every handlers way of rendering for every request we could ahve different ways of handling that request. we should use this function instead of using things like we have on line 65 for example
 
 // we want the header partial to always have access to the userInfo
-// app.use(
-//   let userID = 
-//   res.locals(babelDatabase[userID])
-// )
-// ({defaultUser} = {variable, ...ArgumentsGotFromParameter})
-// {default} = variable
-// variable.default
 
-// extra
 const middleware = (view: string, args?: object) => {
   
   return function (req: express.Request, res: express.Response) {
@@ -150,6 +131,7 @@ app.get("/logout", (req: express.Request, res: express.Response) => {
 
 // this is called whenever the user goes to create a new url
 app.get("/urls/new", middleware('urls_new'))
+
 // this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
 app.post("/urls/new", (_req: express.Request, res: express.Response) => {
   const shortURL = generateRandomString();
