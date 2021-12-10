@@ -14,7 +14,11 @@ const morgan = require('morgan');
 ;
 ;
 let babelDatabase = {};
-babelDatabase['SUDOuser'] = {
+// babelDatabase['SUDOuser'] = {
+//   email: "dudiest@dude.org",
+//   password: "supersecret"
+// };
+babelDatabase.SUDOuser = {
     email: "dudiest@dude.org",
     password: "supersecret"
 };
@@ -52,11 +56,7 @@ app.post("/login/", (req, res) => {
 // create a route for the user to register an account
 app.get("/register", (req, res) => {
     res.cookie("user", {});
-    babelDatabase['SUDOuser'] = {
-        email: "dudiest@dude.org",
-        password: "supersecret"
-    };
-    res.render("register", babelDatabase);
+    res.render("register", babelDatabase.SUDOuser);
 });
 // allows the user to register an account
 app.post("/register", (req, res) => {

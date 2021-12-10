@@ -10,7 +10,7 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create Short URL</a>
         <a class="nav-item nav-link" href="/register">Register</a>
-        <%if (true) { %>
+        <%if (SUDOuser !== undefined) { %>
         <a class="nav-item nav-link" href="/logout">Logout</a><% } else { %>
         <form method="POST" action="/login/"> 
           <input type="text" id="username" name="user" value="XxsupersoccerkidxX">

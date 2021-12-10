@@ -12,14 +12,22 @@ interface userInfo {
   email: string,
   password: string
 };
-
+// use enums to store the user's info at some point
+// enum userInfo {
+//   email: string,
+//   password: string
+// };
 interface userDatabase {[key: string]: userInfo}; 
 
 let babelDatabase: userDatabase = {}; 
 
-babelDatabase['SUDOuser'] = {
+// babelDatabase['SUDOuser'] = {
+//   email: "dudiest@dude.org",
+//   password: "supersecret"
+// };
+babelDatabase.SUDOuser = {
   email: "dudiest@dude.org",
-  password: "supersecret"
+    password: "supersecret"
 };
 
 // exmaple user
@@ -49,6 +57,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 // create some middleware for cookies
 app.use(cookieParser());
 
+
 // this is called every time some one goes to localhost:PORT/
 app.get("/", (_req:  express.Request, res: express.Response) => {
   res.render("frontpage");
@@ -73,11 +82,8 @@ app.post("/login/", (req: express.Request, res: express.Response) => {
 // create a route for the user to register an account
 app.get("/register", (req: express.Request, res: express.Response) => {
     res.cookie("user", {});
-    babelDatabase['SUDOuser'] = {
-      email: true,
-      password: "supersecret"
-    };
-    res.render("register", babelDatabase)
+     
+    res.render("register", babelDatabase.SUDOuser);
   }); 
 
 
