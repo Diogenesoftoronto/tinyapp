@@ -19,6 +19,7 @@ let babelDatabase = {};
 //   password: "supersecret"
 // };
 babelDatabase.SUDOuser = {
+    userID: 'SUDOuser',
     email: "dudiest@dude.org",
     password: "supersecret"
 };
@@ -36,10 +37,32 @@ app.use(morgan('dev'));
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 // create some middleware for cookies
 app.use((0, cookie_parser_1.default)());
-// this is called every time some one goes to localhost:PORT/
-app.get("/", (_req, res) => {
-    res.render("frontpage");
-});
+//  define a mirror function that mirrors the callback function of every handlers way of rendering for every request we could ahve different ways of handling that request. we should use this function instead of using things like we have on line 65 for example
+// we want the header partial to always have access to the userInfo
+// app.use(
+//   let userID = 
+//   res.locals(babelDatabase[userID])
+// )
+// ({defaultUser} = {variable, ...ArgumentsGotFromParameter})
+// {default} = variable
+// variable.default
+// extra
+const middleware = (view, args) => {
+    return function (req, res) {
+        var _a;
+        let currentUser = req.cookies["userID"];
+        if (!((_a = babelDatabase === null || babelDatabase === void 0 ? void 0 : babelDatabase[currentUser]) === null || _a === void 0 ? void 0 : _a.userID))
+            currentUser = {
+                userID: 'SudoUser'
+            };
+        // babelDatabase[currentUser]userID
+        res.render(view, Object.assign({ currentUser }, args));
+    };
+};
+// // this is called every time some one goes to localhost:PORT/
+app.get("/", middleware('frontpage'));
+//   res.render("frontpage");
+// });
 // creates a login route
 app.get("/login", (req, res) => {
     res.render("login");
@@ -64,6 +87,7 @@ app.post("/register", (req, res) => {
     const email = req.body.email;
     const pass = req.body.password;
     babelDatabase[userID] = {
+        userID: userID,
         email: email,
         password: pass
     };

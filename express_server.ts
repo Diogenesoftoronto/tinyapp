@@ -8,7 +8,8 @@ const PORT = 4040
 const morgan = require('morgan');
 
 
-interface userInfo { 
+interface userInfo {
+  userID: string;
   email: string,
   password: string
 };
@@ -26,8 +27,9 @@ let babelDatabase: userDatabase = {};
 //   password: "supersecret"
 // };
 babelDatabase.SUDOuser = {
+  userID: 'SUDOuser',
   email: "dudiest@dude.org",
-    password: "supersecret"
+  password: "supersecret"
 };
 
 // exmaple user
@@ -57,11 +59,36 @@ app.use(bodyParser.urlencoded({extended: true}));
 // create some middleware for cookies
 app.use(cookieParser());
 
+//  define a mirror function that mirrors the callback function of every handlers way of rendering for every request we could ahve different ways of handling that request. we should use this function instead of using things like we have on line 65 for example
 
-// this is called every time some one goes to localhost:PORT/
-app.get("/", (_req:  express.Request, res: express.Response) => {
-  res.render("frontpage");
-});
+// we want the header partial to always have access to the userInfo
+// app.use(
+//   let userID = 
+//   res.locals(babelDatabase[userID])
+// )
+// ({defaultUser} = {variable, ...ArgumentsGotFromParameter})
+// {default} = variable
+// variable.default
+
+// extra
+const middleware = (view: string, args?: object) => {
+  
+  return function (req: express.Request, res: express.Response) {
+    let currentUser = req.cookies["userID"]
+    if (!babelDatabase?.[currentUser]?.userID) currentUser = {
+      userID: 'SudoUser'
+    }
+    // babelDatabase[currentUser]userID
+    res.render(view, {currentUser, ...args} )
+  }
+}
+
+
+
+// // this is called every time some one goes to localhost:PORT/
+app.get("/", middleware('frontpage', ))
+//   res.render("frontpage");
+// });
 
 // creates a login route
 app.get("/login", (req: express.Request, res: express.Response) => {
@@ -82,17 +109,18 @@ app.post("/login/", (req: express.Request, res: express.Response) => {
 // create a route for the user to register an account
 app.get("/register", (req: express.Request, res: express.Response) => {
     res.cookie("user", {});
-     
+    
     res.render("register", babelDatabase.SUDOuser);
   }); 
 
 
 // allows the user to register an account
 app.post("/register", (req: express.Request, res: express.Response) => {
-    const userID = req.body.username;
+    const userID: string = req.body.username;
     const email = req.body.email;
     const pass = req.body.password;
     babelDatabase[userID] = {
+        userID: userID,
         email: email,
         password: pass
     }

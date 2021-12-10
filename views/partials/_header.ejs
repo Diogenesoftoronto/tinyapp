@@ -5,19 +5,19 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="collapse navbar-collapse" style="display: flex;  justify-content: space-between" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create Short URL</a>
         <a class="nav-item nav-link" href="/register">Register</a>
-        <%if (SUDOuser !== undefined) { %>
-        <a class="nav-item nav-link" href="/logout">Logout</a><% } else { %>
+      </div>
+    </div>
+    <%if (currentUser.userID !== undefined) { %>
+      <a class="nav-item nav-link" href="/logout">Logout</a><% } else { %>
         <form method="POST" action="/login/"> 
           <input type="text" id="username" name="user" value="XxsupersoccerkidxX">
           <input type="submit" value="login">
-          <% } %> 
-        </div>
-      </div>
-    </form>
-  </nav>
+        </form>
+        <% } %> 
+      </nav>
 </header>
