@@ -158,7 +158,8 @@ app.get("/urls/:shortURL", (req:  express.Request, res: express.Response) => {
       userID: 'SudoUser'
     }
     // babelDatabase[currentUser]userID
-    res.render('urls_show', {currentUser, urlKeyValue} )
+    res.render('urls_show', {currentUser, shortURL: shortURL,
+      longURL: longURL } )
 });
 
 // when the user submits an Update request, it should modify the corresponding longURL.
@@ -169,14 +170,14 @@ app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
 });
 
 // this is called when we want to look at all the urls in the database
-app.get("/urls", (_req:  express.Request, res: express.Response) => {
+app.get("/urls", (req:  express.Request, res: express.Response) => {
   const allUrls = { urls: urlDatabase };
   let currentUser = req.cookies["userID"]
   if (!babelDatabase?.[currentUser]?.userID) currentUser = {
     userID: undefined
   }
   // babelDatabase[currentUser]userID
-  res.render('urls_index', {currentUser, allUrls} )
+  res.render('urls_index', {currentUser, urls: urlDatabase} )
 });
 
 // when a user enters a new url the server generates a short url and stores it in the database then redirects the user to the urls stored on the server
@@ -197,7 +198,10 @@ app.post("/urls/:shortURL/delete", (req: express.Request, res: express.Response)
 app.get("/urls.json", (_req:  express.Request, res: express.Response) => {
   res.json(urlDatabase);
 });
-
+//  this is all the accounts but in a json format fr debugging
+app.get("/babelDatabase.json", (_req:  express.Request, res: express.Response) => {
+  res.json(babelDatabase);
+});
 // this is called to recieve requests to the server
 app.listen(PORT, () => {
   console.log(`Tinyapp listening on port ${PORT}!`);

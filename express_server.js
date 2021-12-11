@@ -11,13 +11,10 @@ const userInDatabase = require("./user-in-database.js");
 const app = (0, express_1.default)();
 const PORT = 4040;
 const morgan = require('morgan');
+const userInfoInDatabase = require("./user-in-database.js");
 ;
 ;
 let babelDatabase = {};
-// babelDatabase['SUDOuser'] = {
-//   email: "dudiest@dude.org",
-//   password: "supersecret"
-// };
 babelDatabase.SUDOuser = {
     userID: 'SUDOuser',
     email: "dudiest@dude.org",
@@ -37,16 +34,7 @@ app.use(morgan('dev'));
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 // create some middleware for cookies
 app.use((0, cookie_parser_1.default)());
-//  define a mirror function that mirrors the callback function of every handlers way of rendering for every request we could ahve different ways of handling that request. we should use this function instead of using things like we have on line 65 for example
 // we want the header partial to always have access to the userInfo
-// app.use(
-//   let userID = 
-//   res.locals(babelDatabase[userID])
-// )
-// ({defaultUser} = {variable, ...ArgumentsGotFromParameter})
-// {default} = variable
-// variable.default
-// extra
 const middleware = (view, args) => {
     return function (req, res) {
         var _a;
@@ -61,12 +49,8 @@ const middleware = (view, args) => {
 };
 // // this is called every time some one goes to localhost:PORT/
 app.get("/", middleware('frontpage'));
-//   res.render("frontpage");
-// });
 // creates a login route
-app.get("/login", (req, res) => {
-    res.render("login");
-});
+app.get("/login", middleware('login'));
 // allows users to login using their password
 app.post("/login/", (req, res) => {
     const userID = req.body.user;
@@ -76,11 +60,28 @@ app.post("/login/", (req, res) => {
     }
     res.redirect("/login");
 });
-// create a route for the user to register an account
-app.get("/register", (req, res) => {
-    res.cookie("user", {});
-    res.render("register", babelDatabase.SUDOuser);
+app.post("/login", (req, res) => {
+    const userID = req.cookies["user"];
+    const email = req.body.email;
+    const pass = req.body.password;
+    const user = {
+        userID: userID,
+        email: email,
+        password: pass
+    };
+    if (userInfoInDatabase(user, babelDatabase).flag) {
+        babelDatabase[userID] = {
+            userID: userID,
+            email: email,
+            password: pass
+        };
+        res.cookie('account', babelDatabase[userID]);
+        // // add more later here
+        res.redirect("/");
+    }
 });
+// create a route for the user to register an account
+app.get("/register", middleware('register'));
 // allows the user to register an account
 app.post("/register", (req, res) => {
     const userID = req.body.username;
@@ -103,9 +104,7 @@ app.get("/logout", (req, res) => {
     res.redirect("/");
 });
 // this is called whenever the user goes to create a new url
-app.get("/urls/new", (_req, res) => {
-    res.render("urls_new");
-});
+app.get("/urls/new", middleware('urls_new'));
 // this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
 app.post("/urls/new", (_req, res) => {
     const shortURL = generateRandomString();
@@ -120,13 +119,21 @@ app.get("/u/:shortURL", (req, res) => {
 });
 // this is called everytime a short url is requested from urls
 app.get("/urls/:shortURL", (req, res) => {
+    var _a;
     const shortURL = req.params.shortURL;
     const longURL = urlDatabase[shortURL];
     const urlKeyValue = {
         shortURL: shortURL,
         longURL: longURL
     };
-    res.render("urls_show", urlKeyValue);
+    let currentUser = req.cookies["userID"];
+    if (!((_a = babelDatabase === null || babelDatabase === void 0 ? void 0 : babelDatabase[currentUser]) === null || _a === void 0 ? void 0 : _a.userID))
+        currentUser = {
+            userID: 'SudoUser'
+        };
+    // babelDatabase[currentUser]userID
+    res.render('urls_show', { currentUser, shortURL: shortURL,
+        longURL: longURL });
 });
 // when the user submits an Update request, it should modify the corresponding longURL.
 app.post("/urls/:shortURL", (req, res) => {
@@ -135,9 +142,16 @@ app.post("/urls/:shortURL", (req, res) => {
     res.redirect("/urls");
 });
 // this is called when we want to look at all the urls in the database
-app.get("/urls", (_req, res) => {
+app.get("/urls", (req, res) => {
+    var _a;
     const allUrls = { urls: urlDatabase };
-    res.render("urls_index", allUrls);
+    let currentUser = req.cookies["userID"];
+    if (!((_a = babelDatabase === null || babelDatabase === void 0 ? void 0 : babelDatabase[currentUser]) === null || _a === void 0 ? void 0 : _a.userID))
+        currentUser = {
+            userID: undefined
+        };
+    // babelDatabase[currentUser]userID
+    res.render('urls_index', { currentUser, urls: urlDatabase });
 });
 // when a user enters a new url the server generates a short url and stores it in the database then redirects the user to the urls stored on the server
 app.post("/urls", (req, res) => {
