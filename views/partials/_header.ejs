@@ -13,7 +13,7 @@
         <a class="nav-item nav-link" href="/register">Register</a>
       </div>
     </div>
-    <%if (currentUser !== "tempUser") { %>
+    <%if (user.username !== "tempUser") { %>
       <a class="nav-item nav-link" href="/logout">Logout</a><% } else { %>
         <form method="POST" action="/login/partial"> 
           <input type="text" id="username" name="userID" value="XxsupersoccerkidxX">

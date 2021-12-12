@@ -27,9 +27,10 @@ const middleware = (view: string, args?: object) => {
 
     let currentUser: any = req.cookies.userID; // current user is a string
 
-    if (!babelDatabase?.isUsernameInDB(currentUser)) { //makes sure that the current user has a userID even if it is undefined
+    if (babelDatabase.isUsernameInDB(currentUser) === false || currentUser === undefined) { //makes sure that the current user has a userID even if it is undefined
       currentUser = 'tempUser';
-      res.render(view, {currentUser, ...args} );
+      const user = new User(currentUser);
+      res.render(view, {user, ...args} );
     } else {
       const user = babelDatabase.userbyUsername(req.cookies.userID);
       res.render(view, {user, ...args} )
