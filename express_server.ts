@@ -25,14 +25,14 @@ const middleware = (view: string, args?: object) => {
   
   return function (req: express.Request, res: express.Response) {
 
-    let currentUser: string = req.body.userID; // current user is a string
+    let currentUser: any = req.cookies.userID; // current user is a string
 
-    if (!babelDatabase.isUsernameInDB(currentUser)) { //makes sure that the current user has a userID even if it is undefined
-      currentUser = 'undefined';
-      const tempUser = new User(currentUser);
-      res.render(view, {tempUser, ...args} );
+    if (!babelDatabase?.isUsernameInDB(currentUser)) { //makes sure that the current user has a userID even if it is undefined
+      currentUser = 'tempUser';
+      res.render(view, {currentUser, ...args} );
     } else {
-      res.render(view, {currentUser, ...args} )
+      const user = babelDatabase.userbyUsername(req.cookies.userID);
+      res.render(view, {user, ...args} )
     }
   }
 }
@@ -67,7 +67,7 @@ app.post("/login", (req: express.Request, res: express.Response) => {
   user.setPassword = req.body.password;
 
   if  (babelDatabase.userInfoInDb(user.getUsername, user.getEmail,user.getPassword) === true) {
-    babelDatabase.setUser(user)
+    babelDatabase.setUser = user
     res.cookie('email', user.getEmail)
     res.cookie('userID', user.getUsername)
     res.cookie('password', user.getPassword)
@@ -95,7 +95,7 @@ app.post("/register", (req: express.Request, res: express.Response) => {
     if(babelDatabase.userInfoInDb(user.getUsername, user.getEmail,user.getPassword) === true) {
       res.redirect("/login");
     } else {
-      babelDatabase.setUser(user)
+      babelDatabase.setUser = user;
       res.cookie('email', user.getEmail)
       res.cookie('userID', user.getUsername)
       res.cookie('password', user.getPassword)
@@ -124,7 +124,7 @@ app.get("/urls/new", middleware('urls_new'))
 
 // this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
 app.post("/urls/new", (req: express.Request, res: express.Response) => {
-  if(babelDatabase.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.email) === false) {
+  if(babelDatabase?.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.userID, req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.userID, req.cookies.email) === false) {
     res.status(403).send("You must be logged in to send information to this page");
   }
   const user = babelDatabase.userbyUsername(req.cookies.userID);
@@ -138,7 +138,7 @@ app.post("/urls/new", (req: express.Request, res: express.Response) => {
 
 // this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
 app.get("/u/:shortURL", (req: express.Request, res: express.Response) => {
-  if(babelDatabase.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.email) === false) {
+  if(babelDatabase?.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.userID, req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.userID, req.cookies.email) === false) {
     res.status(403).send("You must be logged in to view this page");
   }
   const shortURL = req.params.shortURL;
@@ -150,7 +150,7 @@ app.get("/u/:shortURL", (req: express.Request, res: express.Response) => {
 
 // this is called everytime a short url is requested from urls
 app.get("/urls/:shortURL", (req: express.Request, res: express.Response) => {
-  if(babelDatabase.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.email) === false) {
+  if(babelDatabase?.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.userID, req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.userID, req.cookies.email) === false) {
     res.status(403).send("You must be logged in to view this page");
   }
   const user: User = babelDatabase.userbyUsername(req.cookies.userID)
@@ -164,7 +164,7 @@ app.get("/urls/:shortURL", (req: express.Request, res: express.Response) => {
 
 // when the user submits an Update request, it should modify the corresponding longURL.
 app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
-  if(babelDatabase.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.email) === false) {
+  if(babelDatabase?.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.userID, req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.userID, req.cookies.email) === false) {
     res.status(403).send("You must be logged in to send information to this page");
   }
   // look for the current user
@@ -182,18 +182,12 @@ app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
 
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (req: express.Request, res: express.Response) => {
-  if(!req.cookies.userID && !req.cookies.password && !req.cookies.email) {
+  if(babelDatabase?.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.userID, req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.userID, req.cookies.email) === false) {
     res.status(403).send("You must be logged in to view this page");
   }
-  let currentUser = req.body.userID; // current user is a string
 
-    if (!babelDatabase.isUsernameInDB(currentUser)) { //makes sure that the current user has a userID even if it is undefined
-      currentUser = undefined;
-      const tempUser = new User(currentUser);
-      res.render('/urls', {tempUser} );
-    } else {
-      res.render('/urls', {currentUser} )
-    }
+    const user = babelDatabase.userbyUsername(req.cookies.userID);
+    res.render('/urls', {user} )
 
 });
 

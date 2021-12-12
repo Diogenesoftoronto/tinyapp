@@ -4,7 +4,7 @@ exports.Database = exports.User = void 0;
 class User {
     constructor(username) {
         this.username = username;
-        this.urls = {};
+        this.urls = [];
         this.password;
         this.email;
         this.session;
@@ -24,11 +24,15 @@ class User {
     get getEmail() {
         return this.email;
     }
-    set setUrls(urls) {
-        this.urls = urls;
+    set setUrls(url) {
+        this.urls.push(url);
     }
     get getUrls() {
-        return this.urls;
+        let result = {};
+        for (let i = 0; i < this.urls.length; i++) {
+            result[this.urls[i].key] = this.urls[i].value;
+        }
+        return result;
     }
     set setSession(session) {
         this.session = session;

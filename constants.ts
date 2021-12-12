@@ -6,4 +6,4 @@ SUDOuser.setPassword = 'SUDOpassword'
 SUDOuser.setUrls = { "s8h76q": "https://www.google.com", "asd832": "https://www.youtube.com" };
 const PORT = 4040
 const babelDatabase: Database = new Database();
-export {babelDatabase, PORT } from './constants';
+export {PORT, babelDatabase };
