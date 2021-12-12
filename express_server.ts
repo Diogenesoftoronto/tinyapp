@@ -1,41 +1,12 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-const generateRandomString = require("./generate-random-string.js");
-const userInDatabase = require("./user-in-database.js");
+import morgan from "morgan";
+import { PORT, babelDatabase} from "./constants";
+import { generateRandomString } from "./generate-random-string";
+import {User} from "./classes";
+
 const app = express()
-const PORT = 4040
-const morgan = require('morgan');
-const userInfoInDatabase = require("./user-in-database.js");
-
-interface userInfo {
-  userID: string;
-  email: string,
-  password: string
-};
-// use enums to store the user's info at some point
-// enum userInfo {
-//   email: string,
-//   password: string
-// };
-interface userDatabase {[key: string]: userInfo}; 
-
-let babelDatabase: userDatabase = {}; 
-
-babelDatabase.SUDOuser = {
-  userID: 'SUDOuser',
-  email: "dudiest@dude.org",
-  password: "supersecret"
-};
-interface urldata {
-  [url: string]: string
-};
-
-let urlDatabase: urldata = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-  "qmHFDk": "https://diogenesoftoronto.wordpress.com/"
-}
 
 // call the set up for th ejs from expressjs
 app.set("view engine", "ejs");
@@ -49,162 +20,223 @@ app.use(bodyParser.urlencoded({extended: true}));
 // create some middleware for cookies
 app.use(cookieParser());
 
-
 // we want the header partial to always have access to the userInfo
-
 const middleware = (view: string, args?: object) => {
   
   return function (req: express.Request, res: express.Response) {
-    let currentUser = req.cookies["userID"]
-    if (!babelDatabase?.[currentUser]?.userID) currentUser = {
-      userID: 'SudoUser'
+
+    let currentUser: string = req.body.userID; // current user is a string
+
+    if (!babelDatabase.isUsernameInDB(currentUser)) { //makes sure that the current user has a userID even if it is undefined
+      currentUser = 'undefined';
+      const tempUser = new User(currentUser);
+      res.render(view, {tempUser, ...args} );
+    } else {
+      res.render(view, {currentUser, ...args} )
     }
-    // babelDatabase[currentUser]userID
-    res.render(view, {currentUser, ...args} )
   }
 }
-
-
-
-// // this is called every time some one goes to localhost:PORT/
+// this is called every time some one goes to localhost:PORT/
 app.get("/", middleware('frontpage' ))
 
 // creates a login route
-app.get("/login", middleware('login' ))
+app.get("/login", middleware('login'))
 
 // allows users to login using their password
-app.post("/login/", (req: express.Request, res: express.Response) => {
+app.post("/login/partial", (req: express.Request, res: express.Response) => {
 
-    const userID = req.body.user
-    res.cookie("user", userID)
-    if (!userInDatabase(userID, babelDatabase)) {
+    const userID = req.body.userID
+
+    if (babelDatabase.isUsernameInDB(userID) === false) {
+
       res.redirect("/register");
+
     }
+    res.cookie("userID", userID)
     res.redirect("/login");
 });
+
+// allows users to login using their password and email
+
 app.post("/login", (req: express.Request, res: express.Response) => {
-  const userID: string = req.cookies["user"]
-  const email = req.body.email;
-  const pass = req.body.password;
-  const user: userInfo = { 
-    userID: userID,
-    email: email,
-    password: pass
+
+  const user = new User(req.cookies.userID)
+  
+  user.setEmail = req.body.email;
+
+  user.setPassword = req.body.password;
+
+  if  (babelDatabase.userInfoInDb(user.getUsername, user.getEmail,user.getPassword) === true) {
+    babelDatabase.setUser(user)
+    res.cookie('email', user.getEmail)
+    res.cookie('userID', user.getUsername)
+    res.cookie('password', user.getPassword)
+    // add more later here
+    res.redirect("/");
+}
+  else {
+    // perhaps add a prefill here
+    res.redirect("/register");
   }
-  if (userInfoInDatabase(user, babelDatabase).flag) {
-    
-  babelDatabase[userID] = {
-      userID: userID,
-      email: email,
-      password: pass
-  }
-  res.cookie('account', babelDatabase[userID])
-  // // add more later here
-  res.redirect("/");
-}});
+});
 
 // create a route for the user to register an account
+
 app.get("/register", middleware('register'))
 
 // allows the user to register an account
 app.post("/register", (req: express.Request, res: express.Response) => {
-    const userID: string = req.body.username;
-    const email = req.body.email;
-    const pass = req.body.password;
-    babelDatabase[userID] = {
-        userID: userID,
-        email: email,
-        password: pass
+  const user = new User(req.body.username);
+
+  user.setEmail = req.body.email;
+
+  user.setPassword = req.body.password;
+
+    if(babelDatabase.userInfoInDb(user.getUsername, user.getEmail,user.getPassword) === true) {
+      res.redirect("/login");
+    } else {
+      babelDatabase.setUser(user)
+      res.cookie('email', user.getEmail)
+      res.cookie('userID', user.getUsername)
+      res.cookie('password', user.getPassword)
+      res.redirect("/");
     }
-    res.cookie('account', babelDatabase[userID])
-    // // add more later here
-    res.redirect("/");
+
+    // add more later here
 });
 
 // allows the user to logout
 app.get("/logout", (req: express.Request, res: express.Response) => {
+
     // remove the cookie
-    res.clearCookie("user");
-    res.clearCookie("account");
+    res.clearCookie("userID");
+
+    res.clearCookie("password");
+
+    res.clearCookie("email");
+
     res.redirect("/");
+
 });
 
 // this is called whenever the user goes to create a new url
 app.get("/urls/new", middleware('urls_new'))
 
 // this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
-app.post("/urls/new", (_req: express.Request, res: express.Response) => {
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = _req.body.longURL;
+app.post("/urls/new", (req: express.Request, res: express.Response) => {
+  if(babelDatabase.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.email) === false) {
+    res.status(403).send("You must be logged in to send information to this page");
+  }
+  const user = babelDatabase.userbyUsername(req.cookies.userID);
+ 
+  const urlPair = {[generateRandomString()]: req.body.longURL}
+  user.setUrls = urlPair;
+
   res.redirect('/urls');
+
 });
 
 // this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
-app.get("/u/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req: express.Request, res: express.Response) => {
+  if(babelDatabase.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.email) === false) {
+    res.status(403).send("You must be logged in to view this page");
+  }
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const user =  babelDatabase.userbyUsername(req.cookies.userID);
+  const longURL = user.getUrls[shortURL];
+
   res.redirect(longURL);
 });
 
 // this is called everytime a short url is requested from urls
-app.get("/urls/:shortURL", (req:  express.Request, res: express.Response) => {
-  const shortURL: string = req.params.shortURL;
-  const longURL: string = urlDatabase[shortURL];
-  const urlKeyValue = {
-     shortURL: shortURL,
-     longURL: longURL }
-    let currentUser = req.cookies["userID"]
-    if (!babelDatabase?.[currentUser]?.userID) currentUser = {
-      userID: 'SudoUser'
-    }
-    // babelDatabase[currentUser]userID
-    res.render('urls_show', {currentUser, shortURL: shortURL,
+app.get("/urls/:shortURL", (req: express.Request, res: express.Response) => {
+  if(babelDatabase.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.email) === false) {
+    res.status(403).send("You must be logged in to view this page");
+  }
+  const user: User = babelDatabase.userbyUsername(req.cookies.userID)
+  const urls = user.getUrls
+  const shortURL = req.params.shortURL;
+  const longURL = urls[shortURL]; 
+    
+    res.render('urls_show', {user, shortURL: shortURL,
       longURL: longURL } )
 });
 
 // when the user submits an Update request, it should modify the corresponding longURL.
 app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
+  if(babelDatabase.isUsernameInDB(req.cookies.userID) === false || babelDatabase.isPasswordInDB(req.cookies.password) === false || babelDatabase.isEmailInDB(req.cookies.email) === false) {
+    res.status(403).send("You must be logged in to send information to this page");
+  }
+  // look for the current user
+  const user: User = babelDatabase.userbyUsername(req.cookies.userID)
+  // store the shortURL
   const shortUrl: string = req.params.shortURL;
-  urlDatabase[shortUrl] = req.body.longURL;
+  // store the longURL
+  const longURL = req.body.longURL;
+  // store the urls in the user object
+  user.setURLs = {
+    shortURL: longURL
+  }; 
   res.redirect("/urls");
 });
 
 // this is called when we want to look at all the urls in the database
-app.get("/urls", (req:  express.Request, res: express.Response) => {
-  const allUrls = { urls: urlDatabase };
-  let currentUser = req.cookies["userID"]
-  if (!babelDatabase?.[currentUser]?.userID) currentUser = {
-    userID: undefined
+app.get("/urls", (req: express.Request, res: express.Response) => {
+  if(!req.cookies.userID && !req.cookies.password && !req.cookies.email) {
+    res.status(403).send("You must be logged in to view this page");
   }
-  // babelDatabase[currentUser]userID
-  res.render('urls_index', {currentUser, urls: urlDatabase} )
+  let currentUser = req.body.userID; // current user is a string
+
+    if (!babelDatabase.isUsernameInDB(currentUser)) { //makes sure that the current user has a userID even if it is undefined
+      currentUser = undefined;
+      const tempUser = new User(currentUser);
+      res.render('/urls', {tempUser} );
+    } else {
+      res.render('/urls', {currentUser} )
+    }
+
 });
 
 // when a user enters a new url the server generates a short url and stores it in the database then redirects the user to the urls stored on the server
-app.post("/urls", (req: express.Request, res: express.Response) => { 
+app.post("/urls", (req: express.Request, res: express.Response) => {
+
   const randomString = generateRandomString();
 
   // urlDatabase[randomString] = req.params.longURL;
   res.redirect(`/urls/${randomString}`);
+
 });
 
 // when a user press the delete button on the urls_index page this is called it then redirects them to the urls_index page after deleting the url
 app.post("/urls/:shortURL/delete", (req: express.Request, res: express.Response) => {
-  delete urlDatabase[req.params.shortURL];
+  const user: User = babelDatabase.userbyUsername(req.cookies.userID)
+  const shortURL = req.params.shortURL;
+  delete user.getUrls[shortURL];
   res.redirect("/urls");
 });
 
 //  this is all the urls but in a json format
-app.get("/urls.json", (_req:  express.Request, res: express.Response) => {
-  res.json(urlDatabase);
+app.get("/urls.json", (req:  express.Request, res: express.Response) => {
+  if (!req.cookies.userID && !req.cookies.password && !req.cookies.email) {
+    res.status(403).send("You must be logged in to view this page");
+  }
+  res.json();
+
 });
-//  this is all the accounts but in a json format fr debugging
-app.get("/babelDatabase.json", (_req:  express.Request, res: express.Response) => {
+//  this is all the accounts but in a json format for debugging
+app.get("/babelDatabase.json", (req:  express.Request, res: express.Response) => {
+  if (!req.cookies.userID && !req.cookies.password && !req.cookies.email) {
+    res.status(403).send("You must be logged in to view this page");
+  }
   res.json(babelDatabase);
+
 });
-// this is called to recieve requests to the server
+
+// this is called to receive requests to the server
 app.listen(PORT, () => {
+
   console.log(`Tinyapp listening on port ${PORT}!`);
+
 });
 
 

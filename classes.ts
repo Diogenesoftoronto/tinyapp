@@ -1,0 +1,122 @@
+class User {
+  [x: string]: any;
+  constructor(username: any){
+    this.username = username;
+    this.urls = [];
+    this.password;
+    this.email;
+    this.session;
+  }
+  get getUsername() {
+    return this.username;
+  }
+  set setPassword (password: any) {
+    this.password = password;
+  }
+  get getPassword() {
+    return this.password;
+  }
+  set setEmail (email: any) {
+    this.email = email;
+  }
+  get getEmail() {
+    return this.email;
+  }
+  set setUrls (url: object) {
+    this.urls.push(url);
+  }
+  get getUrls() {
+    let result: any = {};
+    
+    for (let i: number = 0; i < this.urls.length; i++) {
+
+    result[this.urls[i].key] = this.urls[i].value;
+
+    }
+    
+    return result;
+  }
+  set setSession (session: any) {
+    this.session = session;
+  }
+  get getSession() {
+    return this.session;
+  }
+    
+  // later
+  // set encryptPassword (password) {
+}
+// this is function chaining and it works without getters and setters but is not recommended because it is hard to read:
+// let babelDatabase: object = {};
+// const SUDOuser = new User('SUDOuser').setEmail('dudiest@dude.org').setPassword('SUDOpassword').setUrls({ "s8h76q": "https://www.google.com", "asd832": "https://www.youtube.com" });
+
+// const user = new User('user').setEmail('user@google.com');
+// const user2 = new User('user2').setEmail('superman@google.com');
+
+// instead assign values directly without dot notation:
+
+
+// const user = new User('user');
+// user.setEmail = 'user@google.com';
+
+// const user2 = new User('user2');
+// user2.setEmail = 'superman@google.com';
+
+// set session for the user will be a cookie!
+
+class Database {
+  [x: string]: any;
+  constructor() {
+    this.Database = {};
+    this.Database.users = {};
+  }
+  get usersInDB() {
+    
+    return this.Database.users;
+  }
+  userbyUsername(username: any) {
+    return this.Database.users[username];
+  }
+  set setUser (user: User) {
+    this.Database.users[user.getUsername] = user;
+  }
+  isUsernameInDB(username: any) {
+    let result = false;
+   if (this.Database[username] === username) {
+     result = true;
+   }
+    return result;
+  };
+  isPassInDB(username: any, password: any) {
+    let result = false;
+    if (this.Database[username].password === password) {
+      result = true;
+    }
+    return result;
+  }
+  isEmailInDB(username: any, email: any) {
+    let result = false;
+    if (this.Database[username].email === email) {
+      result = true;
+    }
+    return result;
+  }
+  isSessionInDB(username: any, session: any) {
+    let result = false;
+    if (this.Database[username].session === session) {
+      result = true;
+    }
+    return result;
+  }
+  isUserInfoInDB(username: any, email: any, password: any) {
+    let result = false;
+    if (this.Database[username].email === email && this.Database[username].password === password) {
+      result = true;
+    }
+    return result;
+  }
+
+
+}
+
+export { User, Database };

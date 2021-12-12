@@ -1,21 +1,22 @@
+<!--#region-->
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/">TinyApp</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    
     <div class="collapse navbar-collapse" style="display: flex;  justify-content: space-between" id="navbarNavAltMarkup">
+      <!--#endregion-->
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create Short URL</a>
         <a class="nav-item nav-link" href="/register">Register</a>
       </div>
     </div>
-    <%if (currentUser.userID !== undefined) { %>
+    <%if (currentUser.user != "undefined") { %>
       <a class="nav-item nav-link" href="/logout">Logout</a><% } else { %>
-        <form method="POST" action="/login/"> 
-          <input type="text" id="username" name="user" value="XxsupersoccerkidxX">
+        <form method="POST" action="/login/partial"> 
+          <input type="text" id="username" name="userID" value="XxsupersoccerkidxX">
           <input type="submit" value="login">
         </form>
         <% } %> 

@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.generateRandomString = void 0;
 // creates a random number between min and max
 function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -12,4 +14,4 @@ function generateRandomString() {
     const randomString = `${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}${characters.charAt(getRandomInt(0, characters.length))}`;
     return randomString;
 }
-module.exports = generateRandomString;
+exports.generateRandomString = generateRandomString;
