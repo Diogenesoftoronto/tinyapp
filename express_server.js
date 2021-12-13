@@ -69,7 +69,7 @@ app.post("/login", (req, res) => {
     const user = new classes_1.User(req.cookies.username);
     user.setEmail = req.body.email;
     user.setPassword = req.body.password;
-    if (user.getUsername && constants_1.babelDatabase.isUsernameInDB(user.getUsername)) {
+    if (constants_1.babelDatabase.isUsernameInDB(user.getUsername)) {
         constants_1.babelDatabase.setUser = user;
         res.cookie('email', user.getEmail);
         res.cookie('username', user.getUsername);
@@ -120,7 +120,7 @@ app.get("/urls/new", (req, res) => {
 });
 // this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
 app.post("/urls/new", (req, res) => {
-    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.email, req.cookies.password) === false) {
         res.status(403).send("You must be logged in to send information to this page");
     }
     else {
@@ -132,7 +132,7 @@ app.post("/urls/new", (req, res) => {
 });
 // this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
 app.get("/u/:shortURL", (req, res) => {
-    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.email, req.cookies.password) === false) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {
@@ -144,7 +144,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 // this is called everytime a short url is requested from urls
 app.get("/urls/:shortURL", (req, res) => {
-    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.email, req.cookies.password) === false) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {
@@ -158,7 +158,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 // when the user submits an Update request, it should modify the corresponding longURL.
 app.post("/urls/:shortURL", (req, res) => {
-    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.email, req.cookies.password) === false) {
         res.status(403).send("You must be logged in to send information to this page");
     }
     else {
@@ -167,17 +167,17 @@ app.post("/urls/:shortURL", (req, res) => {
         // store the shortURL
         const shortUrl = req.params.shortURL;
         // store the longURL
-        const longURL = req.body.longURL;
+        const longUrl = req.body.longURL;
         // store the urls in the user object
-        user.setURLs = {
-            shortURL: longURL
+        user.setUrls = {
+            [shortUrl]: longUrl
         };
         res.redirect("/urls");
     }
 });
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (req, res) => {
-    if (constants_1.babelDatabase.isUsernameInDB('SUDOuser') === false) {
+    if (constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.email, req.cookies.password) === false) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {

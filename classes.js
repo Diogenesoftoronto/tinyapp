@@ -28,11 +28,11 @@ class User {
         this.urls.push(url);
     }
     get getUrls() {
-        let result = {};
-        for (let i = 0; i < this.urls.length; i++) {
-            result[this.urls[i].key] = this.urls[i].value;
-        }
-        return result;
+        this.urls.forEach((url) => {
+            const key = Object.keys(url)[0];
+            this.urlsDB[key] = url[key];
+        });
+        return this.urlsDB;
     }
     set setSession(session) {
         this.session = session;
@@ -69,7 +69,7 @@ class Database {
     }
     isUsernameInDB(username) {
         let result = false;
-        if (this.Database[username] === username) {
+        if (this.Database.users[username].username === username) {
             result = true;
         }
         return result;
@@ -77,28 +77,28 @@ class Database {
     ;
     isPassInDB(username, password) {
         let result = false;
-        if (this.Database[username].password === password) {
+        if (this.Database.users[username].password === password) {
             result = true;
         }
         return result;
     }
     isEmailInDB(username, email) {
         let result = false;
-        if (this.Database[username].email === email) {
+        if (this.Database.users[username].email === email) {
             result = true;
         }
         return result;
     }
     isSessionInDB(username, session) {
         let result = false;
-        if (this.Database[username].session === session) {
+        if (this.Database.users[username].session === session) {
             result = true;
         }
         return result;
     }
     isUserInfoInDB(username, email, password) {
         let result = false;
-        if (this.Database[username].email === email && this.Database[username].password === password) {
+        if (this.Database.users[username].email === email && this.Database.users[username].password === password) {
             result = true;
         }
         return result;

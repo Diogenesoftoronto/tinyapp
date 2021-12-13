@@ -11,4 +11,4 @@ const PORT = 4040;
 exports.PORT = PORT;
 const babelDatabase = new classes_1.Database();
 exports.babelDatabase = babelDatabase;
-babelDatabase.setUsers = SUDOuser;
+babelDatabase.setUser = SUDOuser;
