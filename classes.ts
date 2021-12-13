@@ -26,15 +26,15 @@ class User {
     this.urls.push(url);
   }
   get getUrls() {
-    let result: any = {};
-    
-    for (let i: number = 0; i < this.urls.length; i++) {
+    this.urls.forEach((url: any) => {
 
-    result[this.urls[i].key] = this.urls[i].value;
+      const key = Object.keys(url)[0];
 
-    }
+      this.urlsDB[key] = url[key];
+
+    });
     
-    return result;
+    return this.urlsDB;
   }
   set setSession (session: any) {
     this.session = session;

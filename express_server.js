@@ -177,7 +177,7 @@ app.post("/urls/:shortURL", (req, res) => {
 });
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (req, res) => {
-    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUsernameInDB('SUDOuser') === false) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {

@@ -7,5 +7,5 @@ SUDOuser.setUrls = { "s8h76q": "https://www.google.com"};
 SUDOuser.setUrls = {"asd832": "https://www.youtube.com" };
 const PORT = 4040;
 const babelDatabase: Database = new Database();
-babelDatabase.setUsers = SUDOuser;
+babelDatabase.setUser = SUDOuser;
 export {PORT, babelDatabase };

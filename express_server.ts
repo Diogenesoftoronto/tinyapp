@@ -52,7 +52,7 @@ const middleware = (view: string, args?: object) => {
   }
 }
 // this is called every time some one goes to localhost:PORT/
-app.get("/", middleware('frontpage' ))
+app.get("/", middleware('frontpage'))
 
 // creates a login route
 app.get("/login", middleware('login'))
@@ -61,6 +61,7 @@ app.get("/login", middleware('login'))
 app.post("/login/partial", (req: express.Request, res: express.Response) => {
 
     const username = req.body.username;
+    
     res.cookie('username', username); 
     
     if (babelDatabase.isUsernameInDB(username) === false ||babelDatabase.isUsernameInDB(username) === undefined) {
@@ -218,7 +219,7 @@ app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
 
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (req: express.Request, res: express.Response) => {
-  if(babelDatabase.isUsernameInDB(req.cookies.username) === false || babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
+  if(babelDatabase.isUsernameInDB(req.cookies.username) === false) {
     res.status(403).send("You must be logged in to view this page");
   } else {
     
