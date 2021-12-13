@@ -33,7 +33,7 @@ class User {
       this.urlsDB[key] = url[key];
 
     });
-    
+
     return this.urlsDB;
   }
   set setSession (session: any) {
@@ -63,7 +63,6 @@ class User {
 // user2.setEmail = 'superman@google.com';
 
 // set session for the user will be a cookie!
-
 class Database {
   [x: string]: any;
   constructor() {
@@ -82,35 +81,36 @@ class Database {
   }
   isUsernameInDB(username: any) {
     let result = false;
-   if (this.Database[username] === username) {
+    
+   if (this.Database.users[username].username === username) {
      result = true;
    }
     return result;
   };
   isPassInDB(username: any, password: any) {
     let result = false;
-    if (this.Database[username].password === password) {
+    if (this.Database.users[username].password === password) {
       result = true;
     }
     return result;
   }
   isEmailInDB(username: any, email: any) {
     let result = false;
-    if (this.Database[username].email === email) {
+    if (this.Database.users[username].email === email) {
       result = true;
     }
     return result;
   }
   isSessionInDB(username: any, session: any) {
     let result = false;
-    if (this.Database[username].session === session) {
+    if (this.Database.users[username].session === session) {
       result = true;
     }
     return result;
   }
   isUserInfoInDB(username: any, email: any, password: any) {
     let result = false;
-    if (this.Database[username].email === email && this.Database[username].password === password) {
+    if (this.Database.users[username].email === email && this.Database.users[username].password === password) {
       result = true;
     }
     return result;
