@@ -36,14 +36,14 @@ app.use((0, cookie_parser_1.default)());
 // we want the header partial to always have access to the userInfo
 const middleware = (view, args) => {
     return function (req, res) {
-        let currentUser = req.cookies.userID; // current user is a string
-        if (constants_1.babelDatabase.isUsernameInDB(currentUser) === false || currentUser === undefined) { //makes sure that the current user has a userID even if it is undefined
+        let currentUser = req.cookies.username; // current user is a string
+        if (constants_1.babelDatabase.isUsernameInDB(currentUser) === false || currentUser === undefined) { //makes sure that the current user has a username even if it is undefined
             currentUser = 'tempUser';
             const user = new classes_1.User(currentUser);
             res.render(view, Object.assign({ user }, args));
         }
         else {
-            const user = constants_1.babelDatabase.userbyUsername(req.cookies.userID);
+            const user = constants_1.babelDatabase.userbyUsername(req.cookies.username);
             res.render(view, Object.assign({ user }, args));
         }
     };
@@ -54,24 +54,25 @@ app.get("/", middleware('frontpage'));
 app.get("/login", middleware('login'));
 // allows users to login using their password
 app.post("/login/partial", (req, res) => {
-    const userID = req.body.userID;
-    if (constants_1.babelDatabase.isUsernameInDB(userID) === false || constants_1.babelDatabase.isUsernameInDB(userID) === undefined) {
+    const username = req.body.username;
+    res.cookie('username', username);
+    if (constants_1.babelDatabase.isUsernameInDB(username) === false || constants_1.babelDatabase.isUsernameInDB(username) === undefined) {
         res.redirect("/register");
     }
     else {
-        res.cookie("userID", userID);
+        res.cookie("username", username);
         res.redirect("/login");
     }
 });
 // allows users to login using their password and email
 app.post("/login", (req, res) => {
-    const user = new classes_1.User(req.cookies.userID);
-    user.setEmail = req.params.email;
-    user.setPassword = req.params.password;
-    if (constants_1.babelDatabase.isUsernameInDB(user.getUsername) === true || constants_1.babelDatabase.isUsernameInDB(user.getUsername) !== undefined) {
+    const user = new classes_1.User(req.cookies.username);
+    user.setEmail = req.body.email;
+    user.setPassword = req.body.password;
+    if (user.getUsername && constants_1.babelDatabase.isUsernameInDB(user.getUsername)) {
         constants_1.babelDatabase.setUser = user;
         res.cookie('email', user.getEmail);
-        res.cookie('userID', user.getUsername);
+        res.cookie('username', user.getUsername);
         res.cookie('password', user.getPassword);
         // add more later here
         res.redirect("/");
@@ -88,42 +89,42 @@ app.post("/register", (req, res) => {
     const user = new classes_1.User(req.body.username);
     user.setEmail = req.body.email;
     user.setPassword = req.body.password;
-    if (constants_1.babelDatabase.isUsernameInDB(user.getUsername) === true || constants_1.babelDatabase.isUsernameInDB(user.getUsername) != undefined) {
+    if (user.getUsername && constants_1.babelDatabase.isUsernameInDB(user.getUsername)) {
         res.redirect("/login");
     }
     else {
         constants_1.babelDatabase.setUser = user;
         res.cookie('email', user.getEmail);
-        res.cookie('userID', user.getUsername);
+        res.cookie('username', user.getUsername);
         res.cookie('password', user.getPassword);
-        res.redirect("/");
+        res.redirect('/');
     }
     // add more later here
 });
 // allows the user to logout
 app.get("/logout", (req, res) => {
     // remove the cookie
-    res.clearCookie("userID");
+    res.clearCookie("username");
     res.clearCookie("password");
     res.clearCookie("email");
     res.redirect("/");
 });
 // this is called whenever the user goes to create a new url
 app.get("/urls/new", (req, res) => {
-    if (req.cookies.userID === undefined || constants_1.babelDatabase.isUsernameInDB(req.cookies.userID) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.userID, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
         res.status(403).send("You must be logged in to send information to this page");
     }
     else {
-        res.render("urls_new", { user: constants_1.babelDatabase.userbyUsername(req.cookies.userID) });
+        res.render("urls_new", { user: constants_1.babelDatabase.userbyUsername(req.cookies.username) });
     }
 });
 // this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
 app.post("/urls/new", (req, res) => {
-    if (req.cookies.userID === undefined || constants_1.babelDatabase.isUsernameInDB(req.cookies.userID) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.userID, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
         res.status(403).send("You must be logged in to send information to this page");
     }
     else {
-        const user = constants_1.babelDatabase.userbyUsername(req.cookies.userID);
+        const user = constants_1.babelDatabase.userbyUsername(req.cookies.username);
         const urlPair = { [(0, generate_random_string_1.generateRandomString)()]: req.body.longURL };
         user.setUrls = urlPair;
         res.redirect('/urls');
@@ -131,23 +132,23 @@ app.post("/urls/new", (req, res) => {
 });
 // this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
 app.get("/u/:shortURL", (req, res) => {
-    if (req.cookies.userID === undefined || constants_1.babelDatabase.isUsernameInDB(req.cookies.userID) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.userID, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {
         const shortURL = req.params.shortURL;
-        const user = constants_1.babelDatabase.userbyUsername(req.cookies.userID);
+        const user = constants_1.babelDatabase.userbyUsername(req.cookies.username);
         const longURL = user.getUrls[shortURL];
         res.redirect(longURL);
     }
 });
 // this is called everytime a short url is requested from urls
 app.get("/urls/:shortURL", (req, res) => {
-    if (req.cookies.userID === undefined || constants_1.babelDatabase.isUsernameInDB(req.cookies.userID) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.userID, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {
-        const user = constants_1.babelDatabase.userbyUsername(req.cookies.userID);
+        const user = constants_1.babelDatabase.userbyUsername(req.cookies.username);
         const urls = user.getUrls;
         const shortURL = req.params.shortURL;
         const longURL = urls[shortURL];
@@ -157,12 +158,12 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 // when the user submits an Update request, it should modify the corresponding longURL.
 app.post("/urls/:shortURL", (req, res) => {
-    if (req.cookies.userID === undefined || constants_1.babelDatabase.isUsernameInDB(req.cookies.userID) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.userID, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
         res.status(403).send("You must be logged in to send information to this page");
     }
     else {
         // look for the current user
-        const user = constants_1.babelDatabase.userbyUsername(req.cookies.userID);
+        const user = constants_1.babelDatabase.userbyUsername(req.cookies.username);
         // store the shortURL
         const shortUrl = req.params.shortURL;
         // store the longURL
@@ -176,11 +177,11 @@ app.post("/urls/:shortURL", (req, res) => {
 });
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (req, res) => {
-    if (req.cookies.userID === undefined || constants_1.babelDatabase.isUsernameInDB(req.cookies.userID) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.userID, req.cookies.password, req.cookies.email) === false) {
+    if (constants_1.babelDatabase.isUsernameInDB(req.cookies.username) === false || constants_1.babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {
-        const user = constants_1.babelDatabase.userbyUsername(req.cookies.userID);
+        const user = constants_1.babelDatabase.userbyUsername(req.cookies.username);
         res.render('/urls', { user });
     }
 });
@@ -192,14 +193,14 @@ app.post("/urls", (req, res) => {
 });
 // when a user press the delete button on the urls_index page this is called it then redirects them to the urls_index page after deleting the url
 app.post("/urls/:shortURL/delete", (req, res) => {
-    const user = constants_1.babelDatabase.userbyUsername(req.cookies.userID);
+    const user = constants_1.babelDatabase.userbyUsername(req.cookies.username);
     const shortURL = req.params.shortURL;
     delete user.getUrls[shortURL];
     res.redirect("/urls");
 });
 //  this is all the urls but in a json format
 app.get("/urls.json", (req, res) => {
-    if (!req.cookies.userID && !req.cookies.password && !req.cookies.email) {
+    if (!req.cookies.username && !req.cookies.password && !req.cookies.email) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {
@@ -208,7 +209,7 @@ app.get("/urls.json", (req, res) => {
 });
 //  this is all the accounts but in a json format for debugging
 app.get("/babelDatabase.json", (req, res) => {
-    if (!req.cookies.userID && !req.cookies.password && !req.cookies.email) {
+    if (!req.cookies.username && !req.cookies.password && !req.cookies.email) {
         res.status(403).send("You must be logged in to view this page");
     }
     else {
