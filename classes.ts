@@ -1,3 +1,5 @@
+import bcrypt from "bcrypt";
+
 class User {
   [x: string]: any;
   constructor(username: any){
@@ -40,9 +42,12 @@ class User {
   get getSession() {
     return this.session;
   }
-    
-  // later
-  // set encryptPassword (password) {
+  set encryptPassword (password: any) {
+    this.password = bcrypt.hashSync(password, 10);
+  }
+  checkPassword (password: any) {
+    return bcrypt.compareSync(password, this.password);
+  }
 }
 // this is function chaining and it works without getters and setters but is not recommended because it is hard to read:
 // let babelDatabase: object = {};
