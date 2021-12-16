@@ -192,7 +192,13 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
     const user = constants_1.babelDatabase.userbyUsername(req.cookies.username);
     const shortURL = req.params.shortURL;
+    const urlObject = {
+        [shortURL]: user.getUrls[shortURL]
+    };
+    const index = user.urls.indexOf(urlObject);
+    user.urls.splice(index, 1);
     delete user.getUrls[shortURL];
+    delete user.urlsDB[shortURL];
     res.redirect("/urls");
 });
 //  this is all the urls but in a json format

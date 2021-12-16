@@ -24,16 +24,13 @@ class User {
     return this.email;
   }
   set setUrls (url: object) {
+    console.log(this.urls)
     this.urls.push(url);
   }
   get getUrls() {
     this.urls.forEach((url: any) => {
-      console.log(url)
       const key = Object.keys(url)[0];
-      console.log(key)
-      console.log(url[key])
       this.urlsDB[key] = url[key];
-      console.log(this.urlsDB)
     });
 
     return this.urlsDB;

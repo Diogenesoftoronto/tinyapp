@@ -238,7 +238,13 @@ app.post("/urls", (req: express.Request, res: express.Response) => {
 app.post("/urls/:shortURL/delete", (req: express.Request, res: express.Response) => {
   const user: User = babelDatabase.userbyUsername(req.cookies.username)
   const shortURL = req.params.shortURL;
-  delete user.getUrls[shortURL];
+  const urlObject = {
+    [shortURL]: user.getUrls[shortURL]
+  }
+  const index = user.urls.indexOf(urlObject)
+  user.urls.splice(index, 1)
+  delete user.getUrls[shortURL]
+  delete user.urlsDB[shortURL]
   res.redirect("/urls");
 });
 
