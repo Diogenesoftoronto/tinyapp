@@ -68,7 +68,7 @@ app.post("/login/partial", (req, res) => {
 app.post("/login", (req, res) => {
     const user = new classes_1.User(req.cookies.username);
     user.setEmail = req.body.email;
-    user.setPassword = req.body.password;
+    user.encryptPassword = req.body.password;
     if (constants_1.babelDatabase.isUsernameInDB(user.getUsername)) {
         constants_1.babelDatabase.setUser = user;
         res.cookie('email', user.getEmail);
@@ -86,7 +86,7 @@ app.get("/register", middleware('register'));
 app.post("/register", (req, res) => {
     const user = new classes_1.User(req.body.username);
     user.setEmail = req.body.email;
-    user.setPassword = req.body.password;
+    user.encryptPassword = req.body.password;
     if (constants_1.babelDatabase.isUsernameInDB(user.getUsername)) {
         res.redirect("/login");
     }

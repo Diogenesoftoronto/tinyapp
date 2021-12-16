@@ -85,7 +85,7 @@ app.post("/login", (req: express.Request, res: express.Response) => {
   
   user.setEmail = req.body.email;
 
-  user.setPassword = req.body.password;
+  user.encryptPassword = req.body.password;
 
   if  (babelDatabase.isUsernameInDB(user.getUsername)) {
     babelDatabase.setUser = user;
@@ -110,7 +110,7 @@ app.post("/register", (req: express.Request, res: express.Response) => {
 
   user.setEmail = req.body.email;
 
-  user.setPassword = req.body.password;
+  user.encryptPassword = req.body.password;
 
     if(babelDatabase.isUsernameInDB(user.getUsername)) {
       res.redirect("/login");

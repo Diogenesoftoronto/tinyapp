@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Database = exports.User = void 0;
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 class User {
     constructor(username) {
         this.username = username;
@@ -40,6 +44,12 @@ class User {
     }
     get getSession() {
         return this.session;
+    }
+    set encryptPassword(password) {
+        this.password = bcryptjs_1.default.hashSync(password, 10);
+    }
+    checkPassword(password) {
+        return bcryptjs_1.default.compareSync(password, this.password);
     }
 }
 exports.User = User;
