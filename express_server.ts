@@ -60,17 +60,13 @@ app.get("/login", middleware('login'))
 // allows users to login using their password
 app.post("/login/partial", (req: express.Request, res: express.Response) => {
 
-    const username = req.body.username;
-    
-    res.cookie('username', username); 
-    
-    if (babelDatabase.isUsernameInDB(username) === false ||babelDatabase.isUsernameInDB(username) === undefined) {
+    res.cookie('username', req.body.username); 
+
+    if (babelDatabase.isUsernameInDB(req.body.username) === false) {
       
       res.redirect("/register");
       
     } else {
-      
-    res.cookie("username", username);
 
     res.redirect("/login");
 
@@ -92,11 +88,10 @@ app.post("/login", (req: express.Request, res: express.Response) => {
     res.cookie('email', user.getEmail);
     res.cookie('username', user.getUsername);
     res.cookie('password', user.getPassword);
-    // add more later here
     res.redirect("/");
 }
   else {
-    // perhaps add a prefill here
+
     res.redirect("/register");
   }
 });
@@ -113,7 +108,7 @@ app.post("/register", (req: express.Request, res: express.Response) => {
 
   user.setPassword = req.body.password;
 
-    if(user.getUsername && babelDatabase.isUsernameInDB(user.getUsername)) {
+    if(babelDatabase.isUsernameInDB(user.getUsername)) {
       res.redirect("/login");
     } else {
 
@@ -144,7 +139,7 @@ app.get("/logout", (req: express.Request, res: express.Response) => {
 
 // this is called whenever the user goes to create a new url
 app.get("/urls/new", (req: express.Request, res: express.Response) => {
-  if(babelDatabase.isUsernameInDB(req.cookies.username) === false || babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.password, req.cookies.email) === false ) {
+  if(babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.email, req.cookies.password) === false) {
     res.status(403).send("You must be logged in to send information to this page");
   } else {
   res.render("urls_new", {user: babelDatabase.userbyUsername(req.cookies.username)});
@@ -202,7 +197,6 @@ app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
   if(babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.email, req.cookies.password) === false ) {
     res.status(403).send("You must be logged in to send information to this page");
   } else {
-
     // look for the current user
     const user: User = babelDatabase.userbyUsername(req.cookies.username)
     // store the shortURL
@@ -224,7 +218,8 @@ app.get("/urls", (req: express.Request, res: express.Response) => {
   } else {
     
     const user = babelDatabase.userbyUsername(req.cookies.username);
-    res.render('/urls', {user} )
+    const urls = user.getUrls
+    res.render('urls_index', {user, urls} )
   }
 
 });
@@ -249,7 +244,7 @@ app.post("/urls/:shortURL/delete", (req: express.Request, res: express.Response)
 
 //  this is all the urls but in a json format
 app.get("/urls.json", (req:  express.Request, res: express.Response) => {
-  if (!req.cookies.username && !req.cookies.password && !req.cookies.email) {
+  if (babelDatabase.isUserInfoInDB(req.cookies.username, req.cookies.email, req.cookies.password) === false ) {
     res.status(403).send("You must be logged in to view this page");
   } else {
     res.json();

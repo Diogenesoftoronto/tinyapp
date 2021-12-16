@@ -68,9 +68,15 @@ class Database {
         this.Database.users[user.getUsername] = user;
     }
     isUsernameInDB(username) {
+        // drifyied!
         let result = false;
-        if (this.Database.users[username].username === username) {
-            result = true;
+        try {
+            if (this.Database.users[username].username === username) {
+                result = true;
+            }
+        }
+        catch (TypeError) {
+            result = false;
         }
         return result;
     }
@@ -97,9 +103,15 @@ class Database {
         return result;
     }
     isUserInfoInDB(username, email, password) {
+        // drifyied!
         let result = false;
-        if (this.Database.users[username].email === email && this.Database.users[username].password === password) {
-            result = true;
+        try {
+            if (this.Database.users[username].email === email && this.Database.users[username].password === password) {
+                result = true;
+            }
+        }
+        catch (TypeError) {
+            result = false;
         }
         return result;
     }
