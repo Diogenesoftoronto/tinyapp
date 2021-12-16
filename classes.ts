@@ -6,6 +6,7 @@ class User {
     this.password;
     this.email;
     this.session;
+    this.urlsDB = {};
   }
   get getUsername() {
     return this.username;
@@ -27,11 +28,12 @@ class User {
   }
   get getUrls() {
     this.urls.forEach((url: any) => {
-
+      console.log(url)
       const key = Object.keys(url)[0];
-
+      console.log(key)
+      console.log(url[key])
       this.urlsDB[key] = url[key];
-
+      console.log(this.urlsDB)
     });
 
     return this.urlsDB;

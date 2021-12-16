@@ -218,8 +218,8 @@ app.get("/urls", (req: express.Request, res: express.Response) => {
   } else {
     
     const user = babelDatabase.userbyUsername(req.cookies.username);
-    const urls = user.getUrls
-    res.render('urls_index', {user, urls} )
+    const urls = user.getUrls;
+    res.render('urls_index', {user, urls} );
   }
 
 });
