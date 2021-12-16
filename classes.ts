@@ -24,7 +24,6 @@ class User {
     return this.email;
   }
   set setUrls (url: object) {
-    console.log(this.urls)
     this.urls.push(url);
   }
   get getUrls() {
@@ -76,6 +75,16 @@ class Database {
     return this.Database.users[username];
   }
   set setUser (user: User) {
+    // if you try to enter an empty user into the database, it will throw an error!
+    if (user.getUsername === '') {
+      throw new Error('username cannot be empty');
+    }
+    if (user.getPassword === '') {
+      throw new Error('password cannot be empty');
+    }
+    if (user.getEmail === '') {
+      throw new Error('email cannot be empty');
+    }
     this.Database.users[user.getUsername] = user;
   }
   isUsernameInDB(username: any) {

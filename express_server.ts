@@ -5,8 +5,12 @@ import morgan from "morgan";
 import {PORT, babelDatabase} from "./constants";
 import {generateRandomString } from "./generate-random-string";
 import {User} from "./classes";
-
+import session from "express-session"
 const app = express()
+
+// app.use(session({
+
+// }))
 // const validateCookie = (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
 //     const { cookie } = req;

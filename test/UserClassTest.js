@@ -16,20 +16,10 @@ describe("#User Class", () => {
             expect(user.getUsername).to.equal('username1');
         });
     });
-    describe('#get password', () => {
-        it('should return password', () => {
-            expect(user.getPassword).to.equal('');
-        });
-    });
-    describe('#set password', () => {
+    describe('#set&get password', () => {
         it('should set password', () => {
             user.setPassword = 'password1';
             expect(user.getPassword).to.equal('password1');
-        });
-    });
-    describe('#get email', () => {
-        it('should return email', () => {
-            expect(user.getEmail).to.equal('');
         });
     });
     describe('#set email', () => {
@@ -38,23 +28,18 @@ describe("#User Class", () => {
             expect(user.getEmail).to.equal('test@email.com');
         });
     });
-    describe('#get urls', () => {
-        it('should return urls', () => {
-            expect(user.getUrls).to.equal('');
+    describe('#get email', () => {
+        it('should return email', () => {
+            expect(user.getEmail).to.equal('');
         });
     });
-    describe('#set urls', () => {
+    describe('#set&get urls', () => {
         it('should set urls', () => {
             user.setUrls = { 'url1': 'https://www.google.com' };
             expect(user.getUrls).to.eql({ 'url1': 'https://www.google.com' });
         });
     });
-    describe('#get session', () => {
-        it('should return session', () => {
-            expect(user.getSession).to.equal('');
-        });
-    });
-    describe('#set session', () => {
+    describe('#set&get session', () => {
         it('should set session', () => {
             user.setSession = 'session1';
             expect(user.getSession).to.equal('session1');

@@ -11,6 +11,8 @@ const constants_1 = require("./constants");
 const generate_random_string_1 = require("./generate-random-string");
 const classes_1 = require("./classes");
 const app = (0, express_1.default)();
+// app.use(session({
+// }))
 // const validateCookie = (req: express.Request, res: express.Response, next: express.NextFunction) => {
 //     const { cookie } = req;
 //     if ('session_id' in cookie) {
