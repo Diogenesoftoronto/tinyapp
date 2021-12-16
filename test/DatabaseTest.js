@@ -20,7 +20,7 @@ describe('#Database Class', () => {
     describe('#set&get users', () => {
         it('should set users', () => {
             database.setUsers = user;
-            expect(database.usersInDB[user.getUsername]).to.eql(user);
+            expect(database.usersInDB).to.eql(user);
         });
     });
     describe('#get users', () => {
