@@ -5,7 +5,7 @@ A url shortener written in TypeScript. Using the express framework.It has alread
 
 !["When you first come to the page you will have an option to login or register. There is a youtube video that you can watch that will explain what a URL shortener is as well."](#https://github.com/Diogenesoftoronto/tinyapp/blob/main/Frontpage.png)
 
-!["You can only login in if you have already registered before! If you try to Login it will redirect you to the register page if you have not registered before! And if you have registered it will send you to the Login page. If you put in an empty password, username, or email, it will send you an error. You must fill all fields."](#https://github.com/Diogenesoftoronto/tinyapp/blob/main/Registration.png)
+!["You can only login in if you have already registered before! If you try to Login it will redirect you to the register page if you have not registered before! And if you have registered it will send you to the Login page. If you put in an empty password, username, or email, it will send you an error. You must fill all fields."](#images/Registration.png)
 
 !["If you have registered you can now create a new URL and it will be shortened to a unique code. You can then go to the URL and it will redirect you to the original URL."](#https://github.com/Diogenesoftoronto/tinyapp/blob/main/CreateUrl.png)
 
