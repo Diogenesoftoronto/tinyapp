@@ -17,20 +17,6 @@ app.use((0, cookie_session_1.default)({
     // Cookie Options
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
-// const validateCookie = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-//     const { cookie } = req;
-//     if ('session_id' in cookie) {
-//     if (cookie) {
-//         if (babelDatabase[cookie]) {
-//             next();
-//         } else {
-//             res.sendStatus(401);
-//         }
-//     } else {
-//         res.sendStatus(401);
-//     }
-// }
-// call the set up for th ejs from expressjs
 app.set("view engine", "ejs");
 // call the morgan to log the request this is middleware it executes as a async function and is called before every route
 app.use((0, morgan_1.default)('dev'));
