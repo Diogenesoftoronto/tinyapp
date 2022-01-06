@@ -7,11 +7,14 @@
     </button>
     <div class="collapse navbar-collapse" style="display: flex;  justify-content: space-between" id="navbarNavAltMarkup">
       <!--#endregion-->
-      <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create Short URL</a>
-        <%if (user.getUsername !== "tempUser") { %>
-          <a class="nav-item nav-link" href="/logout">Logout</a>
+      <div class="navbar-nav" style='width: 100%'>
+          <a class="nav-item nav-link" href="/urls">My URLs</a>
+          <a class="nav-item nav-link" href="/urls/new">Create Short URL</a>
+          <%if (user.getUsername !== "tempUser") { %>
+            <a class="nav-item nav-link" href="/logout">Logout</a> 
+          <div>
+            <span class="nav-item nav-link">Logged in as <%=user.getEmail%></span>
+          </div> 
           <% } else { %>
             <a class="nav-item nav-link" href="/register">Register</a>
         </div>

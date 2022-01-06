@@ -22,8 +22,10 @@ A url shortener written in TypeScript. Using the express framework.It has alread
 - bcrypt
 - body-parser
 - cookie-session
-
+- ts-node
+- typescript
 ## Getting Started
 
 - Install all dependencies (using the `npm install` command).
 - Run the development web server using the `node express_server.js` command.
+-Then use `npm start` to compile and run the server.

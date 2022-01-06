@@ -7,3 +7,5 @@ make sure user date is not stored in cookies
 encrypt passwords.
 add captchas
 create two factor authentication controls.
+
+refactor classes to work with urls without using an array or using one less.

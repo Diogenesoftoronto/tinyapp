@@ -152,16 +152,11 @@ app.post("/urls/new", (req: express.Request, res: express.Response) => {
 
 // this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
 app.get("/u/:shortURL", (req: express.Request, res: express.Response) => {
-  if(babelDatabase.isUserInfoInDB(req.session.username, req.session.email, req.session.password) === false) {
-    res.status(403).send("You must be logged in to view this page");
-  } else {
-
     const shortURL = req.params.shortURL;
     const user =  babelDatabase.userbyUsername(req.session.username);
     const longURL = user.getUrls[shortURL];
     
     res.redirect(longURL);
-  }
 });
 
 // this is called everytime a short url is requested from urls
@@ -192,9 +187,13 @@ app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
     // store the longURL
     const longUrl = req.body.longURL;
     // store the urls in the user object
-    user.setUrls = {
-      [shortUrl]: longUrl
-    }; 
+    if (user.urlsDB.hasOwnProperty(shortUrl)) {
+      user.urlsDB[shortUrl] = longUrl;
+    } else {
+      user.setUrls = {
+        [shortUrl]: longUrl
+      }; 
+    }
     res.redirect("/urls");
   }
 });
@@ -231,8 +230,10 @@ app.post("/urls/:shortURL/delete", (req: express.Request, res: express.Response)
   }
   const index = user.urls.indexOf(urlObject)
   user.urls.splice(index, 1)
+  console.log(user.urls)
   delete user.getUrls[shortURL]
   delete user.urlsDB[shortURL]
+  console.log(user.urlsDB)
   res.redirect("/urls");
 });
 

@@ -22,3 +22,6 @@ web_modules/
 
 # Dependency directories
 node_modules/
+
+# exclude js files in the github
+*.js

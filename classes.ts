@@ -1,5 +1,4 @@
 import bcrypt from "bcryptjs";
-
 class User {
   [x: string]: any;
   constructor(username: any){
@@ -48,6 +47,11 @@ class User {
   checkPassword (password: any) {
     return bcrypt.compareSync(password, this.password);
   }
+  deleteUrls (shorturl: any) {
+    // first delete the url in the urlDB then delete the index element of the urls array
+    
+  }
+
 }
 // this is function chaining and it works without getters and setters but is not recommended because it is hard to read:
 // let babelDatabase: object = {};
