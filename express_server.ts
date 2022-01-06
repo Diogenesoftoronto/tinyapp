@@ -5,6 +5,7 @@ import {PORT, babelDatabase} from "./constants";
 import {generateRandomString } from "./generate-random-string";
 import {User} from "./classes";
 import cookieSession from "cookie-session";
+import bcrypt from "bcryptjs";
 const app = express()
 
 app.use(cookieSession({
@@ -52,16 +53,16 @@ app.get("/login", middleware('login'))
 
 // allows users to login using their password
 app.post("/login/partial", (req: express.Request, res: express.Response) => {
-
-     req.session['username'] = req.body.username; 
+    // const username = req.body.username;
+    //  req.session[username] = req.body.username; 
 
     if (babelDatabase.isUsernameInDB(req.body.username) === false) {
       
       res.redirect("/register");
       
     } else {
-
-    res.redirect("/login");
+      req.session.username = req.body.username;
+      res.redirect("/login");
 
     }
 });
@@ -70,20 +71,24 @@ app.post("/login/partial", (req: express.Request, res: express.Response) => {
 
 app.post("/login", (req: express.Request, res: express.Response) => {
 
-  const user = new User(req.session.username);
-  
-  user.setEmail = req.body.email;
+  const usernames = req.session.username;
+  const {email, password} = req.body
+  if (email && password) {
+    
+    const user = babelDatabase.userbyUsername(req.session.username);
+    // console.log( "this is the session", req.session)
+    const username = req.session.username;
+    const hashedPassword = user.checkPassword(password) 
+    if (babelDatabase.isEmailInDB(username, email) && user.checkPassword(password)) {
+      console.log("email password",email, password, username, "in if statement")
 
-  user.encryptPassword = req.body.password;
+      req.session.username = user.getUsername;
+      req.session.email = user.getEmail;
+      req.session.password = user.getPassword;
+      return res.redirect("/");
+    }
 
-  if  (babelDatabase.isUsernameInDB(user.getUsername)) {
-    babelDatabase.setUser = user;
-    req.session.username = user.getUsername;
-    req.session.email = user.getEmail;
-    req.session.password = user.getPassword;
-    res.redirect("/");
-}
-  else {
+  } else {
 
     res.redirect("/register");
   }
@@ -102,7 +107,7 @@ app.post("/register", (req: express.Request, res: express.Response) => {
   user.encryptPassword = req.body.password;
 
     if(babelDatabase.isUsernameInDB(user.getUsername)) {
-      res.redirect("/login");
+      return res.redirect("/login");
     } else {
 
       babelDatabase.setUser = user;
@@ -119,8 +124,9 @@ app.post("/register", (req: express.Request, res: express.Response) => {
 app.get("/logout", (req: express.Request, res: express.Response) => {
 
     // remove the cookie
-    req.session = null;
-
+    req.session.username = null;
+    req.session.email = null;
+    req.session.password = null;
     res.redirect("/");
 
 });
@@ -187,12 +193,17 @@ app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
     // store the longURL
     const longUrl = req.body.longURL;
     // store the urls in the user object
-    if (user.urlsDB.hasOwnProperty(shortUrl)) {
-      user.urlsDB[shortUrl] = longUrl;
-    } else {
-      user.setUrls = {
-        [shortUrl]: longUrl
-      }; 
+    
+      // bad solution
+    let count = 0;
+    for (const url of user.urls) {
+      if (url.hasOwnProperty(shortUrl)) {
+        console.log("abc", url, count);
+        user.urls[count] = {[shortUrl]: longUrl}
+        break;
+      }
+      console.log(user.urls.length)
+      count += 1;
     }
     res.redirect("/urls");
   }
@@ -200,6 +211,8 @@ app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
 
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (req: express.Request, res: express.Response) => {
+  
+  console.log( "random string is ", generateRandomString())
   if(babelDatabase.isUserInfoInDB(req.session.username, req.session.email, req.session.password) === false ) {
     res.status(403).send("You must be logged in to view this page");
   } else {

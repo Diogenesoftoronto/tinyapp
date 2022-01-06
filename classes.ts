@@ -68,7 +68,7 @@ class User {
 
 // const user2 = new User('user2');
 // user2.setEmail = 'superman@google.com';
-
+// user3.setUrlS = { "s8h76q": "https://www.google.com"}
 // set session for the user will be a cookie!
 class Database {
   [x: string]: any;
@@ -132,9 +132,11 @@ class Database {
   }
   isUserInfoInDB(username: any, email: any, password: any) {
     // drifyied!
+    console.log("database user", this.Database.users[username])
     let result = false;
     try {
       if (this.Database.users[username].email === email && this.Database.users[username].password === password) {
+        
         result = true;
       }
     }

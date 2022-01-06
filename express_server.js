@@ -46,25 +46,32 @@ app.get("/", middleware('frontpage'));
 app.get("/login", middleware('login'));
 // allows users to login using their password
 app.post("/login/partial", (req, res) => {
-    req.session['username'] = req.body.username;
+    // const username = req.body.username;
+    //  req.session[username] = req.body.username; 
     if (constants_1.babelDatabase.isUsernameInDB(req.body.username) === false) {
         res.redirect("/register");
     }
     else {
+        req.session.username = req.body.username;
         res.redirect("/login");
     }
 });
 // allows users to login using their password and email
 app.post("/login", (req, res) => {
-    const user = new classes_1.User(req.session.username);
-    user.setEmail = req.body.email;
-    user.encryptPassword = req.body.password;
-    if (constants_1.babelDatabase.isUsernameInDB(user.getUsername)) {
-        constants_1.babelDatabase.setUser = user;
-        req.session.username = user.getUsername;
-        req.session.email = user.getEmail;
-        req.session.password = user.getPassword;
-        res.redirect("/");
+    const usernames = req.session.username;
+    const { email, password } = req.body;
+    if (email && password) {
+        const user = constants_1.babelDatabase.userbyUsername(req.session.username);
+        // console.log( "this is the session", req.session)
+        const username = req.session.username;
+        const hashedPassword = user.checkPassword(password);
+        if (constants_1.babelDatabase.isEmailInDB(username, email) && user.checkPassword(password)) {
+            console.log("email password", email, password, username, "in if statement");
+            req.session.username = user.getUsername;
+            req.session.email = user.getEmail;
+            req.session.password = user.getPassword;
+            return res.redirect("/");
+        }
     }
     else {
         res.redirect("/register");
@@ -78,7 +85,7 @@ app.post("/register", (req, res) => {
     user.setEmail = req.body.email;
     user.encryptPassword = req.body.password;
     if (constants_1.babelDatabase.isUsernameInDB(user.getUsername)) {
-        res.redirect("/login");
+        return res.redirect("/login");
     }
     else {
         constants_1.babelDatabase.setUser = user;
@@ -92,7 +99,9 @@ app.post("/register", (req, res) => {
 // allows the user to logout
 app.get("/logout", (req, res) => {
     // remove the cookie
-    req.session = null;
+    req.session.username = null;
+    req.session.email = null;
+    req.session.password = null;
     res.redirect("/");
 });
 // this is called whenever the user goes to create a new url
@@ -118,15 +127,10 @@ app.post("/urls/new", (req, res) => {
 });
 // this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
 app.get("/u/:shortURL", (req, res) => {
-    if (constants_1.babelDatabase.isUserInfoInDB(req.session.username, req.session.email, req.session.password) === false) {
-        res.status(403).send("You must be logged in to view this page");
-    }
-    else {
-        const shortURL = req.params.shortURL;
-        const user = constants_1.babelDatabase.userbyUsername(req.session.username);
-        const longURL = user.getUrls[shortURL];
-        res.redirect(longURL);
-    }
+    const shortURL = req.params.shortURL;
+    const user = constants_1.babelDatabase.userbyUsername(req.session.username);
+    const longURL = user.getUrls[shortURL];
+    res.redirect(longURL);
 });
 // this is called everytime a short url is requested from urls
 app.get("/urls/:shortURL", (req, res) => {
@@ -155,14 +159,23 @@ app.post("/urls/:shortURL", (req, res) => {
         // store the longURL
         const longUrl = req.body.longURL;
         // store the urls in the user object
-        user.setUrls = {
-            [shortUrl]: longUrl
-        };
+        // bad solution
+        let count = 0;
+        for (const url of user.urls) {
+            if (url.hasOwnProperty(shortUrl)) {
+                console.log("abc", url, count);
+                user.urls[count] = { [shortUrl]: longUrl };
+                break;
+            }
+            console.log(user.urls.length);
+            count += 1;
+        }
         res.redirect("/urls");
     }
 });
 // this is called when we want to look at all the urls in the database
 app.get("/urls", (req, res) => {
+    console.log("random string is ", (0, generate_random_string_1.generateRandomString)());
     if (constants_1.babelDatabase.isUserInfoInDB(req.session.username, req.session.email, req.session.password) === false) {
         res.status(403).send("You must be logged in to view this page");
     }
@@ -187,8 +200,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     };
     const index = user.urls.indexOf(urlObject);
     user.urls.splice(index, 1);
+    console.log(user.urls);
     delete user.getUrls[shortURL];
     delete user.urlsDB[shortURL];
+    console.log(user.urlsDB);
     res.redirect("/urls");
 });
 //  this is all the urls but in a json format

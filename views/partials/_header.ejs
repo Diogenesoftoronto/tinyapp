@@ -10,7 +10,7 @@
       <div class="navbar-nav" style='width: 100%'>
           <a class="nav-item nav-link" href="/urls">My URLs</a>
           <a class="nav-item nav-link" href="/urls/new">Create Short URL</a>
-          <%if (user.getUsername !== "tempUser") { %>
+          <%if (user.getEmail !== "tempUser") { %>
             <a class="nav-item nav-link" href="/logout">Logout</a> 
           <div>
             <span class="nav-item nav-link">Logged in as <%=user.getEmail%></span>

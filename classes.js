@@ -51,6 +51,9 @@ class User {
     checkPassword(password) {
         return bcryptjs_1.default.compareSync(password, this.password);
     }
+    deleteUrls(shorturl) {
+        // first delete the url in the urlDB then delete the index element of the urls array
+    }
 }
 exports.User = User;
 // this is function chaining and it works without getters and setters but is not recommended because it is hard to read:
@@ -63,6 +66,7 @@ exports.User = User;
 // user.setEmail = 'user@google.com';
 // const user2 = new User('user2');
 // user2.setEmail = 'superman@google.com';
+// user3.setUrlS = { "s8h76q": "https://www.google.com"}
 // set session for the user will be a cookie!
 class Database {
     constructor() {
@@ -125,6 +129,7 @@ class Database {
     }
     isUserInfoInDB(username, email, password) {
         // drifyied!
+        console.log("database user", this.Database.users[username]);
         let result = false;
         try {
             if (this.Database.users[username].email === email && this.Database.users[username].password === password) {
