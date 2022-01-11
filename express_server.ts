@@ -5,7 +5,6 @@ import {PORT, babelDatabase} from "./constants";
 import {generateRandomString } from "./generate-random-string";
 import {User} from "./classes";
 import cookieSession from "cookie-session";
-import bcrypt from "bcryptjs";
 const app = express()
 
 app.use(cookieSession({
@@ -159,10 +158,17 @@ app.post("/urls/new", (req: express.Request, res: express.Response) => {
 // this gets called whenever the user looks for the longurl for their short url the can use this page to be redirected to the site being referenced in the longurl
 app.get("/u/:shortURL", (req: express.Request, res: express.Response) => {
     const shortURL = req.params.shortURL;
-    const user =  babelDatabase.userbyUsername(req.session.username);
-    const longURL = user.getUrls[shortURL];
-    
-    res.redirect(longURL);
+    const arrResult = babelDatabase.isUrlInDB(shortURL)
+    let longURL;
+    if (arrResult[0]) {
+      longURL = arrResult[1];
+    }
+    if (typeof longURL === 'string') {
+      res.redirect(longURL);
+    }
+    else {
+      res.status(400).send("This url is not in our Database, sorry bud :(")
+    }
 });
 
 // this is called everytime a short url is requested from urls
@@ -234,20 +240,16 @@ app.post("/urls", (req: express.Request, res: express.Response) => {
 
 });
 
-// when a user press the delete button on the urls_index page this is called it then redirects them to the urls_index page after deleting the url
+// when a user press the delete button on the urls_index page this is called it then redirects them to the urls_index page after deleting the url, users who are not logged in can no longer delete other urls
 app.post("/urls/:shortURL/delete", (req: express.Request, res: express.Response) => {
+  if (babelDatabase.isUserInfoInDB(req.session.username, req.session.email, req.session.password) === false ) {
+    res.status(403).send("Hey bud, you can't delete this user's urls without logging in");
+  } else {
   const user: User = babelDatabase.userbyUsername(req.session.username)
   const shortURL = req.params.shortURL;
-  const urlObject = {
-    [shortURL]: user.getUrls[shortURL]
-  }
-  const index = user.urls.indexOf(urlObject)
-  user.urls.splice(index, 1)
-  console.log(user.urls)
   delete user.getUrls[shortURL]
-  delete user.urlsDB[shortURL]
-  console.log(user.urlsDB)
   res.redirect("/urls");
+  }
 });
 
 //  this is all the urls but in a json format
