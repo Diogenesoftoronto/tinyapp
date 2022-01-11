@@ -4,7 +4,7 @@
   "description": "a url shortener written in typescript",
   "main": "index.ts",
   "scripts": {
-    "start": "tsc && ./node_modules/.bin/nodemon -L express_server.js",
+    "start": "tsc && ./node_modules/.bin/nodemon -L express_server",
     "test": "./node_modules/mocha/bin/mocha && echo \"Have some tea with that\""
   },
   "repository": {
