@@ -139,7 +139,7 @@ app.get("/urls/new", (req: express.Request, res: express.Response) => {
   }
 
   });
-// this is called whenever the user submits a new url  it returns them to the database with the new url add to the list
+// this is called whenever the user submits a new url  it returns them to the database with the new url added to the list
 app.post("/urls/new", (req: express.Request, res: express.Response) => {
   if(babelDatabase.isUserInfoInDB(req.session.username, req.session.email, req.session.password) === false ) {
     res.status(403).send("You must be logged in to send information to this page");
@@ -198,19 +198,9 @@ app.post("/urls/:shortURL", (req: express.Request, res: express.Response) => {
     const shortUrl: string = req.params.shortURL;
     // store the longURL
     const longUrl = req.body.longURL;
-    // store the urls in the user object
+    // store the url in the user object
+    user.urlsDB[shortUrl] = longUrl;
     
-      // bad solution
-    let count = 0;
-    for (const url of user.urls) {
-      if (url.hasOwnProperty(shortUrl)) {
-        console.log("abc", url, count);
-        user.urls[count] = {[shortUrl]: longUrl}
-        break;
-      }
-      console.log(user.urls.length)
-      count += 1;
-    }
     res.redirect("/urls");
   }
 });
